@@ -1,25 +1,673 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+ <script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Endless Runner Game</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Number Match Puzzle</title>
+    <script src="<script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>"></script>
+    <script type="text/javascript">
+        (function(){var script=document.createElement('script');script.src="https://s.yllix.com/yllix_web_services.js";script.type="text/javascript";document.getElementsByTagName('head')[0].appendChild(script);})();
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .moves { color: #FFD700; }
+        .time { color: #00FF00; }
+        .score { color: #FF6B6B; }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .number-card {
+            background: linear-gradient(145deg, #FF6B6B, #FF8E53);
+            border-radius: 12px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .number-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .number-card.selected {
+            background: linear-gradient(145deg, #4ECDC4, #44A08D);
+            transform: scale(0.95);
+        }
+        
+        .number-card.matched {
+            background: linear-gradient(145deg, #00b09b, #96c93d);
+            animation: pulse 0.5s ease;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .ad-container {
+            margin: 20px 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .level-indicator {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #FFD700;
+        }
+        
+        .combo-counter {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #00FF00;
+        }
+        
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .reward-popup {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 </head>
 <body>
-    <h1>3D Endless Runner</h1>
-    <div id="game-container"></div>
-    <div id="score-container">Score: <span id="score">0</span></div>
-    <div id="game-over" style="display: none;">
-        <h2>Game Over!</h2>
-        <p>Your Score: <span id="final-score">0</span></p>
-        <button id="restart-button">Restart Game</button>
+    <div class="game-container">
+        <div class="level-indicator">Level: <span id="level">1</span></div>
+        
+        <div class="stats-bar">
+            <div class="moves">MOVES: <span id="moves">0</span></div>
+            <div class="time">TIME: <span id="timer">0.00</span></div>
+            <div class="score">SCORE: <span id="score">0</span></div>
+        </div>
+        
+        <div class="game-grid" id="gameGrid">
+            <!-- Numbers will be generated here -->
+        </div>
+        
+        <div class="combo-counter">Combo: <span id="combo">1x</span></div>
+        
+        <div class="controls">
+            <button onclick="shuffleBoard()">🔀 Shuffle</button>
+            <button onclick="showHint()">💡 Hint</button>
+            <button onclick="pauseGame()">⏸️ Pause</button>
+        </div>
+        
+        <div class="ad-container">
+            <div id="bannerAd"></div>
+        </div>
+        
+        <button onclick="showRewardedAdForHints()">🎁 Get 5 Hints (Watch Ad)</button>
     </div>
 
-    <script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <script src="script.js"></script>
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen">
+        <div class="reward-popup">
+            <h1 style="font-size: 48px; margin-bottom: 20px;">🔢 NUMBER MATCH</h1>
+            <p style="margin-bottom: 30px; font-size: 18px;">Match pairs of numbers to clear the board!</p>
+            <div class="ad-container">
+                <div id="startAd"></div>
+            </div>
+            <button onclick="startGame()" style="font-size: 20px; padding: 15px 30px;">🎮 START GAME</button>
+            <button onclick="showRewardedAdForCoins()" style="margin-top: 15px;">💰 GET 1000 COINS</button>
+            <div style="margin-top: 20px;">
+                <div>High Score: <span id="highScore">0</span></div>
+                <div>Total Coins: <span id="totalCoins">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="screen hidden">
+        <div class="reward-popup">
+            <h1 style="font-size: 36px; margin-bottom: 20px;">🏆 LEVEL COMPLETE!</h1>
+            <div style="font-size: 24px; margin-bottom: 10px;">Score: <span id="finalScore">0</span></div>
+            <div style="margin-bottom: 20px;">
+                <div>Time: <span id="finalTime">0.00</span></div>
+                <div>Moves: <span id="finalMoves">0</span></div>
+                <div>Coins Earned: <span id="coinsEarned">0</span></div>
+            </div>
+            <div class="ad-container">
+                <div id="endAd"></div>
+            </div>
+            <button onclick="nextLevel()">➡️ NEXT LEVEL</button>
+            <button onclick="showRewardedAdForDoubleCoins()" style="margin-top: 10px;">💰 DOUBLE COINS</button>
+            <button onclick="showStartScreen()" style="margin-top: 10px;">🏠 MAIN MENU</button>
+        </div>
+    </div>
+
+    <!-- Pause Screen -->
+    <div id="pauseScreen" class="screen hidden">
+        <div class="reward-popup">
+            <h1 style="font-size: 36px; margin-bottom: 20px;">⏸️ GAME PAUSED</h1>
+            <button onclick="resumeGame()">▶️ RESUME</button>
+            <button onclick="restartGame()" style="margin-top: 10px;">🔄 RESTART</button>
+            <button onclick="showStartScreen()" style="margin-top: 10px;">🏠 MAIN MENU</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            moves: 0,
+            score: 0,
+            time: 0,
+            level: 1,
+            hints: 3,
+            totalCoins: 0,
+            highScore: 0,
+            selectedCards: [],
+            matchedPairs: 0,
+            totalPairs: 8,
+            gameRunning: false,
+            timer: null,
+            combo: 1,
+            lastMatchTime: 0,
+            gridSize: 16 // 4x4 grid
+        };
+
+        // Initialize Telegram
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+
+       
+// Rewarded interstitial
+
+show_10010275().then(() => {
+    // You need to add your user reward function here, which will be executed after the user watches the ad.
+    // For more details, please refer to the detailed instructions.
+    alert('You have seen an ad!');
+})
+
+        
+                    yllix.createWidget({
+                        container: 'startAd',
+                        type: 'banner',
+                        width: 300,
+                        height: 250
+                    });
+                    yllix.createWidget({
+                        container: 'endAd',
+                        type: 'banner',
+                        width: 300,
+                        height: 250
+                    });
+                } else {
+                    setTimeout(initializeAds, 1000);
+                }
+            } catch (error) {
+                console.error('Ad initialization error:', error);
+            }
+        }
+
+        // Start game
+        function startGame() {
+            gameState.gameRunning = true;
+            gameState.moves = 0;
+            gameState.score = 0;
+            gameState.time = 0;
+            gameState.matchedPairs = 0;
+            gameState.selectedCards = [];
+            gameState.combo = 1;
+            
+            document.getElementById('startScreen').classList.add('hidden');
+            createBoard();
+            startTimer();
+            updateUI();
+        }
+
+        // Create number board
+        function createBoard() {
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+            
+            // Create pairs of numbers
+            const numbers = [];
+            const pairCount = gameState.gridSize / 2;
+            
+            for (let i = 1; i <= pairCount; i++) {
+                numbers.push(i, i);
+            }
+            
+            // Shuffle numbers
+            shuffleArray(numbers);
+            
+            // Create cards
+            numbers.forEach((number, index) => {
+                const card = document.createElement('div');
+                card.className = 'number-card';
+                card.textContent = number;
+                card.dataset.number = number;
+                card.dataset.index = index;
+                card.onclick = () => selectCard(card);
+                grid.appendChild(card);
+            });
+        }
+
+        // Select card
+        function selectCard(card) {
+            if (!gameState.gameRunning) return;
+            if (card.classList.contains('selected') || card.classList.contains('matched')) return;
+            if (gameState.selectedCards.length >= 2) return;
+            
+            card.classList.add('selected');
+            gameState.selectedCards.push(card);
+            
+            if (gameState.selectedCards.length === 2) {
+                gameState.moves++;
+                checkMatch();
+            }
+            
+            updateUI();
+        }
+
+        // Check if selected cards match
+        function checkMatch() {
+            const [card1, card2] = gameState.selectedCards;
+            const number1 = card1.dataset.number;
+            const number2 = card2.dataset.number;
+            
+            if (number1 === number2) {
+                // Match found
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                gameState.matchedPairs++;
+                
+                // Calculate combo
+                const currentTime = Date.now();
+                if (currentTime - gameState.lastMatchTime < 2000) {
+                    gameState.combo++;
+                } else {
+                    gameState.combo = 1;
+                }
+                gameState.lastMatchTime = currentTime;
+                
+                // Calculate score
+                const baseScore = 100 * gameState.level;
+                const comboBonus = gameState.combo * 50;
+                const timeBonus = Math.max(0, 500 - Math.floor(gameState.time)) * 2;
+                const moveBonus = Math.max(0, 50 - gameState.moves) * 5;
+                
+                const points = baseScore + comboBonus + timeBonus + moveBonus;
+                gameState.score += points;
+                
+                // Check level completion
+                if (gameState.matchedPairs >= gameState.totalPairs) {
+                    completeLevel();
+                }
+            } else {
+                // No match
+                setTimeout(() => {
+                    card1.classList.remove('selected');
+                    card2.classList.remove('selected');
+                    gameState.combo = 1;
+                }, 1000);
+            }
+            
+            setTimeout(() => {
+                gameState.selectedCards = [];
+            }, 1000);
+        }
+
+        // Complete level
+        function completeLevel() {
+            gameState.gameRunning = false;
+            clearInterval(gameState.timer);
+            
+            const coinsEarned = Math.floor(gameState.score / 10);
+            gameState.totalCoins += coinsEarned;
+            
+            if (gameState.score > gameState.highScore) {
+                gameState.highScore = gameState.score;
+            }
+            
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('finalTime').textContent = gameState.time.toFixed(2);
+            document.getElementById('finalMoves').textContent = gameState.moves;
+            document.getElementById('coinsEarned').textContent = coinsEarned;
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+            
+            saveGame();
+            showInterstitialAd();
+        }
+
+        // Next level
+        function nextLevel() {
+            gameState.level++;
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            startGame();
+        }
+
+        // Shuffle board
+        function shuffleBoard() {
+            if (!gameState.gameRunning) return;
+            if (gameState.moves < 5) return; // Prevent abuse
+            
+            const cards = Array.from(document.getElementsByClassName('number-card'));
+            const numbers = cards.map(card => card.dataset.number);
+            shuffleArray(numbers);
+            
+            cards.forEach((card, index) => {
+                card.textContent = numbers[index];
+                card.dataset.number = numbers[index];
+                card.classList.remove('selected', 'matched');
+            });
+            
+            gameState.selectedCards = [];
+            gameState.moves += 3; // Penalty for shuffling
+            updateUI();
+        }
+
+        // Show hint
+        function showHint() {
+            if (!gameState.gameRunning) return;
+            if (gameState.hints <= 0) {
+                alert('No hints left! Watch an ad to get more.');
+                return;
+            }
+            
+            const unmatchedCards = Array.from(document.getElementsByClassName('number-card'))
+                .filter(card => !card.classList.contains('matched'));
+            
+            if (unmatchedCards.length >= 2) {
+                // Find a matching pair
+                const numbers = {};
+                let pair = [];
+                
+                unmatchedCards.forEach(card => {
+                    const num = card.dataset.number;
+                    if (numbers[num]) {
+                        pair = [numbers[num], card];
+                    } else {
+                        numbers[num] = card;
+                    }
+                });
+                
+                if (pair.length === 2) {
+                    pair[0].style.backgroundColor = '#4ECDC4';
+                    pair[1].style.backgroundColor = '#4ECDC4';
+                    
+                    setTimeout(() => {
+                        pair[0].style.backgroundColor = '';
+                        pair[1].style.backgroundColor = '';
+                    }, 2000);
+                    
+                    gameState.hints--;
+                }
+            }
+        }
+
+        // Timer functions
+        function startTimer() {
+            gameState.timer = setInterval(() => {
+                if (gameState.gameRunning) {
+                    gameState.time += 0.1;
+                    updateUI();
+                }
+            }, 100);
+        }
+
+        // Pause/resume game
+        function pauseGame() {
+            if (!gameState.gameRunning) return;
+            gameState.gameRunning = false;
+            clearInterval(gameState.timer);
+            document.getElementById('pauseScreen').classList.remove('hidden');
+        }
+
+        function resumeGame() {
+            gameState.gameRunning = true;
+            document.getElementById('pauseScreen').classList.add('hidden');
+            startTimer();
+        }
+
+        // Restart game
+        function restartGame() {
+            document.getElementById('pauseScreen').classList.add('hidden');
+            startGame();
+        }
+
+        // Show start screen
+        function showStartScreen() {
+            document.getElementById('startScreen').classList.remove('hidden');
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            document.getElementById('pauseScreen').classList.add('hidden');
+            updateUI();
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('moves').textContent = gameState.moves;
+            document.getElementById('timer').textContent = gameState.time.toFixed(2);
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('combo').textContent = gameState.combo + 'x';
+            document.getElementById('highScore').textContent = gameState.highScore;
+            document.getElementById('totalCoins').textContent = gameState.totalCoins;
+        }
+
+        // Ad functions
+        function showRewardedAdForHints() {
+            try {
+                if (typeof yllix !== 'undefined') {
+                    yllix.showInterstitial({
+                        onClose: function() {
+                            gameState.hints += 5;
+                            updateUI();
+                            saveGame();
+                            alert('🎉 You received 5 hints!');
+                        },
+                        onError: function() {
+                            alert('❌ Ad not available. Please try again later.');
+                        }
+                    });
+                } else {
+                    gameState.hints += 5;
+                    updateUI();
+                    saveGame();
+                    alert('🎉 TEST: You received 5 hints!');
+                }
+            } catch (error) {
+                console.error('Ad error:', error);
+            }
+        }
+
+        function showRewardedAdForCoins() {
+            try {
+                if (typeof yllix !== 'undefined') {
+                    yllix.showInterstitial({
+                        onClose: function() {
+                            gameState.totalCoins += 1000;
+                            updateUI();
+                            saveGame();
+                            alert('🎉 You received 1000 coins!');
+                        },
+                        onError: function() {
+                            alert('❌ Ad not available. Please try again later.');
+                        }
+                    });
+                } else {
+                    gameState.totalCoins += 1000;
+                    updateUI();
+                    saveGame();
+                    alert('🎉 TEST: You received 1000 coins!');
+                }
+            } catch (error) {
+                console.error('Ad error:', error);
+            }
+        }
+
+        function showRewardedAdForDoubleCoins() {
+            try {
+                if (typeof yllix !== 'undefined') {
+                    yllix.showInterstitial({
+                        onClose: function() {
+                            const coinsEarned = Math.floor(gameState.score / 10);
+                            gameState.totalCoins += coinsEarned;
+                            updateUI();
+                            saveGame();
+                            alert('🎉 Coins doubled!');
+                        },
+                        onError: function() {
+                            alert('❌ Ad not available. Please try again later.');
+                        }
+                    });
+                } else {
+                    const coinsEarned = Math.floor(gameState.score / 10);
+                    gameState.totalCoins += coinsEarned;
+                    updateUI();
+                    saveGame();
+                    alert('🎉 TEST: Coins doubled!');
+                }
+            } catch (error) {
+                console.error('Ad error:', error);
+            }
+        }
+
+        function showInterstitialAd() {
+            try {
+                if (typeof yllix !== 'undefined' && Math.random() < 0.3) {
+                    setTimeout(() => yllix.showInterstitial({}), 1000);
+                }
+            } catch (error) {
+                console.error('Interstitial ad error:', error);
+            }
+        }
+
+        // Utility functions
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Save/load game
+        function saveGame() {
+            localStorage.setItem('numberMatchSave', JSON.stringify({
+                totalCoins: gameState.totalCoins,
+                highScore: gameState.highScore,
+                hints: gameState.hints
+            }));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('numberMatchSave');
+            if (saved) {
+                const savedState = JSON.parse(saved);
+                gameState.totalCoins = savedState.totalCoins || 0;
+                gameState.highScore = savedState.highScore || 0;
+                gameState.hints = savedState.hints || 3;
+            }
+        }
+
+        // Initialize game
+        window.addEventListener('load', () => {
+            loadGame();
+            updateUI();
+            initializeAds();
+            
+            // Telegram Main Button
+            Telegram.WebApp.MainButton.setText('10010275')
+                .onClick(() => {
+                    Telegram.WebApp.openTelegramLink('https://t.me/your_bot?start=number_match');
+                })
+                .show();
+        });
+    </script><script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>
 </body>
+  <script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>  
 </html>
