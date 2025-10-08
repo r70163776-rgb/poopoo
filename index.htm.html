@@ -1,72 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coin Tapper - With Ads</title>
+    <title>Puzzle Game with Ads</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
     <!-- Monetag SDK -->
-    <<script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>">
+    <script type="text/javascript">
         (function() {
             var script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = 'https://sdk.monetag.com/JS/SDK.js';
-            script.onload = function() {
-                // Initialize Monetag after SDK loads
-                if (typeof monetag !== 'undefined') {
-                    monetag.start();
-                    console.log('Monetag SDK loaded successfully');
-                }
-            };
-            document.head.appendChild(script);
+            script.src = "https://s.yllix.com/yllix_web_services.js";
+            script.type = "text/javascript";
+            document.getElementsByTagName('head')[0].appendChild(script);
         })();
     </script>
-    
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             font-family: -apple-system, system-ui, sans-serif;
             background: var(--tg-theme-bg-color, #18222d);
             color: var(--tg-theme-text-color, #ffffff);
             text-align: center;
-            min-height: 100vh;
         }
         
-        .container {
-            max-width: 400px;
+        .game-container {
+            max-width: 500px;
             margin: 0 auto;
+            padding: 20px;
         }
         
-        .coins-display {
-            font-size: 48px;
-            font-weight: bold;
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
             margin: 20px 0;
-            color: #ffd700;
         }
         
-        .tap-area {
-            width: 200px;
-            height: 200px;
-            background: linear-gradient(145deg, #ffd700, #ff6b00);
-            border-radius: 50%;
-            margin: 30px auto;
-            cursor: pointer;
+        .puzzle-piece {
+            aspect-ratio: 1;
+            background: var(--tg-theme-button-color, #2481cc);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             font-weight: bold;
-            color: white;
+            cursor: pointer;
             user-select: none;
-            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
-            border: 4px solid #fff;
-            transition: all 0.1s;
+            transition: all 0.2s;
         }
         
-        .tap-area:active {
+        .puzzle-piece.empty {
+            background: transparent;
+            cursor: default;
+        }
+        
+        .puzzle-piece:active:not(.empty) {
             transform: scale(0.95);
+        }
+        
+        .ad-container {
+            margin: 20px 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--tg-theme-secondary-bg-color, #2a3942);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
         }
         
         .stats {
@@ -82,411 +101,339 @@
             flex: 1;
             margin: 0 5px;
         }
-        
-        .shop {
-            margin-top: 30px;
-        }
-        
-        .shop-item {
-            background: var(--tg-theme-secondary-bg-color, #2a3942);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .buy-btn {
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        
-        .ad-section {
-            margin: 20px 0;
-            padding: 15px;
-            background: var(--tg-theme-secondary-bg-color, #2a3942);
-            border-radius: 12px;
-        }
-        
-        .ad-btn {
-            background: linear-gradient(145deg, #ff6b6b, #ee5a24);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin: 5px;
-            width: 100%;
-        }
-        
-        .ad-btn:disabled {
-            background: #666;
-            cursor: not-allowed;
-        }
-        
-        /* Ad container styling */
-        #monetag-banner {
-            margin: 20px auto;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            color: #888;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>💰 Coin POOPOO</h1>
-        
-        <div class="coins-display" id="coins">0</div>
-        
-        <div class="tap-area" id="tapButton">
-         POOPOO
-        </div>
+    <div class="game-container">
+        <h1>🧩 Puzzle Game</h1>
         
         <div class="stats">
             <div class="stat-item">
-                <div>Per Tap</div>
-                <div id="perTap">1</div>
+                <div>Moves</div>
+                <div id="moves">0</div>
             </div>
             <div class="stat-item">
-                <div>Total Taps</div>
-                <div id="totalTaps">0</div>
+                <div>Time</div>
+                <div id="timer">0s</div>
             </div>
         </div>
         
-        <!-- Monetag Banner Ad Container -->
-        <div class="ad-section">
-            <h3>📺 Advertisement</h3>
-            <div id="monetag-banner">
-                Loading ad...
-            </div>
+        <div class="puzzle-grid" id="puzzleGrid">
+            <!-- Puzzle pieces will be generated here -->
         </div>
         
-        <!-- Rewarded Ads Section -->
-        <div class="ad-section">
-            <h3>🎁 Bonus Rewards</h3>
-            <button class="ad-btn" onclick="<script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>('doubleCoins')" id="doubleCoinsBtn">
-                Watch Ad = 2x Coins for 30s! 
-            </button>
-            <button class="ad-btn" onclick="<script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>('instantCoins')" id="instantCoinsBtn">
-                Watch Ad = 100 Instant Coins!
-            </button>
-            <button class="ad-btn" onclick="<script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>('autoTapBoost')" id="autoTapBoostBtn">
-                Watch Ad = Auto-tap for 1min!
-            </button>
+        <!-- Monetag Ad Container -->
+        <div class="ad-container">
+            <div id="yllix_widget_8f716"></div>
         </div>
         
-        <div class="shop">
-            <h3>🏪 Upgrade Shop</h3>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Better Fingers</strong><br>
-                    +1 coin per tap
-                </div>
-                <button class="buy-btn" onclick="buyUpgrade('tapPower', 10)">
-                    Buy (10 coins)
-                </button>
-            </div>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Auto Tapper</strong><br>
-                    +1 coin every 5 seconds
-                </div>
-                <button class="buy-btn" onclick="buyUpgrade('autoTap', 50)">
-                    Buy (50 coins)
-                </button>
-            </div>
+        <div class="controls">
+            <button onclick="showRewardedAd()">🎁 Get Hint (Watch Ad)</button>
+            <button onclick="shufflePuzzle()">🔀 Shuffle</button>
+            <button onclick="newGame()">🆕 New Game</button>
         </div>
+        
+        <div id="gameMessage"></div>
     </div>
 
     <script>
         // Game state
         let gameState = {
-            coins: 0,
-            totalTaps: 0,
-            tapPower: 1,
-            autoTapLevel: 0,
-            upgrades: {
-                tapPower: 0,
-                autoTap: 0
-            },
-            boosts: {
-                doubleCoins: false,
-                doubleCoinsEnd: 0,
-                autoTapBoost: false,
-                autoTapBoostEnd: 0
-            },
-            lastAdWatch: 0
+            moves: 0,
+            time: 0,
+            timer: null,
+            gridSize: 4,
+            puzzle: [],
+            emptyIndex: 15,
+            gameStarted: false,
+            hints: 3
         };
-
-        // Ad cooldown in milliseconds (5 minutes)
-        const AD_COOLDOWN = 5 * 60 * 1000;
 
         // Initialize Telegram
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
 
-        // Initialize Monetag Ads
+        // Initialize Monetag
         function initializeMonetag() {
-            if (typeof monetag !== 'undefined') {
-                // Banner Ad
-                monetag.banner({
-                    id: "monetag-banner",
-                    format: "horizontal", // or "vertical", "rectangle"
-                    width: 300,
-                    height: 250
-                });
-                
-                console.log('Monetag ads initialized');
-            } else {
-                console.error('Monetag SDK not loaded');
-                document.getElementById('monetag-banner').innerHTML = 'Ad network not available';
+            try {
+                // Monetag widget initialization
+                if (typeof yllix !== 'undefined') {
+                    yllix.createWidget({
+                        container: 'yllix_widget_8f716',
+                        type: 'banner',
+                        width: 300,
+                        height: 250
+                    });
+                    console.log('Monetag banner ad initialized');
+                } else {
+                    console.warn('Monetag SDK not loaded yet');
+                    // Retry after delay
+                    setTimeout(initializeMonetag, 1000);
+                }
+            } catch (error) {
+                console.error('Error initializing Monetag:', error);
             }
         }
 
         // Show rewarded ad
-        function showRewardedAd(rewardType) {
-            const now = Date.now();
-            const timeSinceLastAd = now - gameState.lastAdWatch;
-            
-            // Check cooldown
-            if (timeSinceLastAd < AD_COOLDOWN) {
-                const minutesLeft = Math.ceil((AD_COOLDOWN - timeSinceLastAd) / 60000);
-                Telegram.WebApp.showAlert(`Please wait ${minutesLeft} minutes before watching another ad.`);
-                return;
-            }
-            
-            if (typeof monetag !== 'undefined') {
-                Telegram.WebApp.showPopup({
-                    title: 'Watch Advertisement',
-                    message: 'Watch a short video to earn bonus rewards!',
-                    buttons: [
-                        {id: 'watch', type: 'default', text: 'Watch Ad'},
-                        {id: 'cancel', type: 'cancel', text: 'Cancel'}
-                    ]
-                }, function(buttonId) {
-                    if (buttonId === 'watch') {
-                        // Show rewarded ad
-                        monetag.rewarded({
-                            onStart: function() {
-                                console.log('Rewarded ad started');
-                            },
-                            onReward: function() {
-                                console.log('Rewarded ad completed');
-                                grantReward(rewardType);
-                                gameState.lastAdWatch = Date.now();
-                                updateAdButtons();
-                            },
-                            onClose: function() {
-                                console.log('Rewarded ad closed');
-                            },
-                            onError: function(error) {
-                                console.error('Rewarded ad error:', error);
-                                Telegram.WebApp.showAlert('Ad failed to load. Please try again later.');
-                            }
-                        });
-                    }
-                });
-            } else {
-                // Fallback: Simulate ad reward for testing
-                Telegram.WebApp.showAlert('Simulating ad reward for testing');
-                grantReward(rewardType);
-                gameState.lastAdWatch = Date.now();
-                updateAdButtons();
-            }
-        }
-
-        // Grant reward after ad
-        function grantReward(rewardType) {
-            switch(rewardType) {
-                case 'doubleCoins':
-                    gameState.boosts.doubleCoins = true;
-                    gameState.boosts.doubleCoinsEnd = Date.now() + 30000; // 30 seconds
-                    Telegram.WebApp.showAlert('🎉 2x Coins activated for 30 seconds!');
-                    break;
-                    
-                case 'instantCoins':
-                    gameState.coins += 100;
-                    Telegram.WebApp.showAlert('🎉 You received 100 coins!');
-                    break;
-                    
-                case 'autoTapBoost':
-                    gameState.boosts.autoTapBoost = true;
-                    gameState.boosts.autoTapBoostEnd = Date.now() + 60000; // 1 minute
-                    Telegram.WebApp.showAlert('🎉 Auto-tap boost activated for 1 minute!');
-                    break;
-            }
-            
-            updateDisplay();
-            saveGame();
-        }
-
-        // Update ad button states
-        function updateAdButtons() {
-            const now = Date.now();
-            const timeSinceLastAd = now - gameState.lastAdWatch;
-            const canWatchAd = timeSinceLastAd >= AD_COOLDOWN;
-            
-            const buttons = ['doubleCoinsBtn', 'instantCoinsBtn', 'autoTapBoostBtn'];
-            buttons.forEach(btnId => {
-                const btn = document.getElementById(btnId);
-                if (canWatchAd) {
-                    btn.disabled = false;
-                    btn.innerHTML = btn.innerHTML.replace(/\(Cooldown.*\)/, '');
+        function showRewardedAd() {
+            try {
+                if (typeof yllix !== 'undefined') {
+                    // Show interstitial ad as rewarded
+                    yllix.showInterstitial({
+                        onClose: function() {
+                            // Reward user after ad is closed
+                            gameState.hints += 1;
+                            updateGameMessage('🎉 You earned 1 hint! Total hints: ' + gameState.hints);
+                            saveGame();
+                        },
+                        onError: function(error) {
+                            updateGameMessage('❌ Ad not available. Please try again later.');
+                        }
+                    });
                 } else {
-                    btn.disabled = true;
-                    const minutesLeft = Math.ceil((AD_COOLDOWN - timeSinceLastAd) / 60000);
-                    btn.innerHTML = btn.innerHTML.split('(')[0] + `(Cooldown: ${minutesLeft}m)`;
+                    // Fallback: simulate ad completion for testing
+                    gameState.hints += 1;
+                    updateGameMessage('🎉 You earned 1 hint! Total hints: ' + gameState.hints);
+                    saveGame();
                 }
+            } catch (error) {
+                console.error('Error showing rewarded ad:', error);
+                updateGameMessage('❌ Error showing ad. Please try again.');
+            }
+        }
+
+        // Show interstitial ad
+        function showInterstitialAd() {
+            try {
+                if (typeof yllix !== 'undefined') {
+                    yllix.showInterstitial({
+                        onClose: function() {
+                            console.log('Interstitial ad closed');
+                        },
+                        onError: function(error) {
+                            console.log('Interstitial ad error:', error);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error showing interstitial ad:', error);
+            }
+        }
+
+        // Puzzle game functions
+        function initializePuzzle() {
+            createPuzzle();
+            renderPuzzle();
+            startTimer();
+            
+            // Initialize ads after game starts
+            setTimeout(initializeMonetag, 1000);
+        }
+
+        function createPuzzle() {
+            gameState.puzzle = [];
+            for (let i = 1; i <= gameState.gridSize * gameState.gridSize; i++) {
+                gameState.puzzle.push(i);
+            }
+            gameState.puzzle[gameState.puzzle.length - 1] = 0; // Empty space
+            gameState.emptyIndex = gameState.puzzle.length - 1;
+        }
+
+        function renderPuzzle() {
+            const grid = document.getElementById('puzzleGrid');
+            grid.innerHTML = '';
+            
+            gameState.puzzle.forEach((number, index) => {
+                const piece = document.createElement('div');
+                piece.className = `puzzle-piece ${number === 0 ? 'empty' : ''}`;
+                piece.textContent = number === 0 ? '' : number;
+                piece.onclick = () => movePiece(index);
+                grid.appendChild(piece);
             });
-        }
-
-        // Check active boosts
-        function checkBoosts() {
-            const now = Date.now();
             
-            if (gameState.boosts.doubleCoins && now > gameState.boosts.doubleCoinsEnd) {
-                gameState.boosts.doubleCoins = false;
-                Telegram.WebApp.showAlert('2x Coins boost has ended.');
-            }
-            
-            if (gameState.boosts.autoTapBoost && now > gameState.boosts.autoTapBoostEnd) {
-                gameState.boosts.autoTapBoost = false;
-                Telegram.WebApp.showAlert('Auto-tap boost has ended.');
-            }
-        }
-
-        // Load saved game
-        function loadGame() {
-            const saved = localStorage.getItem('coinTapperSave');
-            if (saved) {
-                const loadedState = JSON.parse(saved);
-                gameState = { ...gameState, ...loadedState };
-            }
             updateDisplay();
-            updateAdButtons();
         }
 
-        // Save game
-        function saveGame() {
-            localStorage.setItem('coinTapperSave', JSON.stringify(gameState));
-        }
-
-        // Update display
-        function updateDisplay() {
-            document.getElementById('coins').textContent = formatNumber(gameState.coins);
-            document.getElementById('perTap').textContent = gameState.tapPower + (gameState.boosts.doubleCoins ? ' (2x!)' : '');
-            document.getElementById('totalTaps').textContent = gameState.totalTaps;
-        }
-
-        // Format large numbers
-        function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + 'M';
-            }
-            if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
-            }
-            return num.toString();
-        }
-
-        // Tap function
-        function tap() {
-            let coinsEarned = gameState.tapPower;
+        function movePiece(index) {
+            if (!isAdjacentToEmpty(index)) return;
             
-            // Apply 2x boost
-            if (gameState.boosts.doubleCoins) {
-                coinsEarned *= 2;
+            // Swap pieces
+            [gameState.puzzle[gameState.emptyIndex], gameState.puzzle[index]] = 
+            [gameState.puzzle[index], gameState.puzzle[gameState.emptyIndex]];
+            
+            gameState.emptyIndex = index;
+            gameState.moves++;
+            
+            if (!gameState.gameStarted) {
+                gameState.gameStarted = true;
             }
             
-            gameState.coins += coinsEarned;
-            gameState.totalTaps++;
-            updateDisplay();
+            renderPuzzle();
+            checkWin();
+            saveGame();
+        }
+
+        function isAdjacentToEmpty(index) {
+            const emptyRow = Math.floor(gameState.emptyIndex / gameState.gridSize);
+            const emptyCol = gameState.emptyIndex % gameState.gridSize;
+            const pieceRow = Math.floor(index / gameState.gridSize);
+            const pieceCol = index % gameState.gridSize;
+            
+            return (Math.abs(emptyRow - pieceRow) === 1 && emptyCol === pieceCol) ||
+                   (Math.abs(emptyCol - pieceCol) === 1 && emptyRow === pieceRow);
+        }
+
+        function shufflePuzzle() {
+            // Simple shuffle algorithm
+            for (let i = 0; i < 1000; i++) {
+                const adjacent = [];
+                const emptyRow = Math.floor(gameState.emptyIndex / gameState.gridSize);
+                const emptyCol = gameState.emptyIndex % gameState.gridSize;
+                
+                // Find all adjacent pieces
+                for (let i = 0; i < gameState.puzzle.length; i++) {
+                    if (isAdjacentToEmpty(i)) {
+                        adjacent.push(i);
+                    }
+                }
+                
+                // Randomly move an adjacent piece
+                if (adjacent.length > 0) {
+                    const randomIndex = adjacent[Math.floor(Math.random() * adjacent.length)];
+                    [gameState.puzzle[gameState.emptyIndex], gameState.puzzle[randomIndex]] = 
+                    [gameState.puzzle[randomIndex], gameState.puzzle[gameState.emptyIndex]];
+                    gameState.emptyIndex = randomIndex;
+                }
+            }
+            
+            gameState.moves = 0;
+            gameState.time = 0;
+            gameState.gameStarted = false;
+            renderPuzzle();
+            startTimer();
             saveGame();
             
-            // Add visual feedback
-            const tapBtn = document.getElementById('tapButton');
-            tapBtn.style.transform = 'scale(0.95)';
+            // Show interstitial ad after shuffle
+            setTimeout(showInterstitialAd, 500);
+        }
+
+        function startTimer() {
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+            }
+            
+            gameState.timer = setInterval(() => {
+                if (gameState.gameStarted) {
+                    gameState.time++;
+                    updateDisplay();
+                }
+            }, 1000);
+        }
+
+        function checkWin() {
+            for (let i = 0; i < gameState.puzzle.length - 1; i++) {
+                if (gameState.puzzle[i] !== i + 1) {
+                    return false;
+                }
+            }
+            
+            // Puzzle solved!
+            clearInterval(gameState.timer);
+            updateGameMessage('🎉 Congratulations! You solved the puzzle!');
+            
+            // Show rewarded ad on completion
+            setTimeout(showRewardedAd, 1500);
+            
+            return true;
+        }
+
+        function newGame() {
+            clearInterval(gameState.timer);
+            gameState.moves = 0;
+            gameState.time = 0;
+            gameState.gameStarted = false;
+            shufflePuzzle();
+        }
+
+        function updateDisplay() {
+            document.getElementById('moves').textContent = gameState.moves;
+            document.getElementById('timer').textContent = gameState.time + 's';
+        }
+
+        function updateGameMessage(message) {
+            const messageEl = document.getElementById('gameMessage');
+            messageEl.textContent = message;
+            messageEl.style.color = '#ffd700';
+            
             setTimeout(() => {
-                tapBtn.style.transform = 'scale(1)';
-            }, 100);
+                messageEl.textContent = '';
+            }, 3000);
         }
 
-        // Buy upgrade
-        function buyUpgrade(type, cost) {
-            if (gameState.coins >= cost) {
-                gameState.coins -= cost;
-                
-                if (type === 'tapPower') {
-                    gameState.tapPower++;
-                    gameState.upgrades.tapPower++;
-                    // Increase cost for next purchase
-                    cost = Math.floor(cost * 1.5);
-                    document.querySelector(`button[onclick="buyUpgrade('${type}', ${cost})"]`)
-                        .innerHTML = `Buy (${cost} coins)`;
-                }
-                else if (type === 'autoTap') {
-                    gameState.autoTapLevel++;
-                    gameState.upgrades.autoTap++;
-                    // Increase cost for next purchase
-                    cost = Math.floor(cost * 2);
-                    document.querySelector(`button[onclick="buyUpgrade('${type}', ${cost})"]`)
-                        .innerHTML = `Buy (${cost} coins)`;
-                }
-                
+        // Save/load game state
+        function saveGame() {
+            localStorage.setItem('puzzleGameSave', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('puzzleGameSave');
+            if (saved) {
+                const savedState = JSON.parse(saved);
+                gameState = { ...gameState, ...savedState };
+                renderPuzzle();
                 updateDisplay();
-                saveGame();
+                
+                if (gameState.gameStarted) {
+                    startTimer();
+                }
+            } else {
+                shufflePuzzle();
             }
         }
 
-        // Auto-tap system
-        function autoTap() {
-            let coinsEarned = gameState.autoTapLevel;
-            
-            // Apply auto-tap boost
-            if (gameState.boosts.autoTapBoost) {
-                coinsEarned += 5; // Extra coins during boost
-            }
-            
-            if (coinsEarned > 0) {
-                gameState.coins += coinsEarned;
-                updateDisplay();
+        // Use hint
+        function useHint() {
+            if (gameState.hints > 0) {
+                gameState.hints--;
+                // Simple hint: show valid moves
+                const adjacent = [];
+                for (let i = 0; i < gameState.puzzle.length; i++) {
+                    if (isAdjacentToEmpty(i)) {
+                        adjacent.push(i);
+                    }
+                }
+                
+                if (adjacent.length > 0) {
+                    updateGameMessage('💡 Hint: You can move pieces adjacent to the empty space');
+                }
+                
                 saveGame();
+            } else {
+                updateGameMessage('❌ No hints left! Watch an ad to get more.');
             }
         }
 
-        // Set up event listeners
-        document.getElementById('tapButton').addEventListener('click', tap);
+        // Update controls to include hint usage
+        document.addEventListener('DOMContentLoaded', function() {
+            const controls = document.querySelector('.controls');
+            const hintButton = document.createElement('button');
+            hintButton.textContent = '💡 Use Hint (' + gameState.hints + ')';
+            hintButton.onclick = useHint;
+            controls.insertBefore(hintButton, controls.firstChild);
+        });
 
-        // Initialize game
-        loadGame();
-        
-        // Initialize ads after a short delay
-        setTimeout(initializeMonetag, 1000);
-        
-        // Set up intervals
-        setInterval(autoTap, 5000);
-        setInterval(checkBoosts, 1000);
-        setInterval(updateAdButtons, 60000); // Update buttons every minute
-
-        // Set up Telegram Main Button
-        Telegram.WebApp.MainButton.setText(`Share Game`)
-            .onClick(() => {
-                Telegram.WebApp.openTelegramLink('https://t.me/your_bot?start=game');
-            })
-            .show();
+        // Initialize game when page loads
+        window.onload = function() {
+            loadGame();
+            
+            // Set up Telegram Main Button
+            Telegram.WebApp.MainButton.setText('Share Game')
+                .onClick(() => {
+                    Telegram.WebApp.openTelegramLink('https://t.me/your_bot?start=puzzle_game');
+                })
+                .show();
+        };
     </script>
 </body>
 </html>
