@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Number Match Puzzle</title>
-    <script src="<script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script type="text/javascript">
         (function(){var script=document.createElement('script');script.src="https://s.yllix.com/yllix_web_services.js";script.type="text/javascript";document.getElementsByTagName('head')[0].appendChild(script);})();
     </script>
@@ -263,16 +262,16 @@
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
 
-       
-// Rewarded interstitial
-
-show_10010275().then(() => {
-    // You need to add your user reward function here, which will be executed after the user watches the ad.
-    // For more details, please refer to the detailed instructions.
-    alert('You have seen an ad!');
-})
-
-        
+        // Initialize ads
+        function initializeAds() {
+            try {
+                if (typeof yllix !== 'undefined') {
+                    yllix.createWidget({
+                        container: 'bannerAd',
+                        type: 'banner',
+                        width: 320,
+                        height: 100
+                    });
                     yllix.createWidget({
                         container: 'startAd',
                         type: 'banner',
@@ -661,13 +660,12 @@ show_10010275().then(() => {
             initializeAds();
             
             // Telegram Main Button
-            Telegram.WebApp.MainButton.setText('10010275')
+            Telegram.WebApp.MainButton.setText('Share Game')
                 .onClick(() => {
                     Telegram.WebApp.openTelegramLink('https://t.me/your_bot?start=number_match');
                 })
                 .show();
         });
-    </script><script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>
+    </script>
 </body>
-  <script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>  
 </html>
