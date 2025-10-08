@@ -1,11 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>
+<head><script src='//libtl.com/sdk.js' data-zone='10010275' data-sdk='show_10010275'></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coin Tapper</title>
+    <title>Coin Tapper - With Ads</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Monetag SDK -->
+    <script type="text/javascript">
+        (function() {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://sdk.monetag.com/JS/SDK.js';
+            script.onload = function() {
+                // Initialize Monetag after SDK loads
+                if (typeof monetag !== 'undefined') {
+                    monetag.start();
+                    console.log('Monetag SDK loaded successfully');
+                }
+            };
+            document.head.appendChild(script);
+        })();
+    </script>
+    
     <style>
         body {
             margin: 0;
@@ -88,16 +105,52 @@
             border-radius: 8px;
             cursor: pointer;
         }
+        
+        .ad-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--tg-theme-secondary-bg-color, #2a3942);
+            border-radius: 12px;
+        }
+        
+        .ad-btn {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            width: 100%;
+        }
+        
+        .ad-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        /* Ad container styling */
+        #monetag-banner {
+            margin: 20px auto;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>💰 Coin Tapper</h1>
+        <h1>💰 Coin POOPOO</h1>
         
         <div class="coins-display" id="coins">0</div>
         
         <div class="tap-area" id="tapButton">
-            TAP ME!
+         POOPOO
         </div>
         
         <div class="stats">
@@ -109,6 +162,28 @@
                 <div>Total Taps</div>
                 <div id="totalTaps">0</div>
             </div>
+        </div>
+        
+        <!-- Monetag Banner Ad Container -->
+        <div class="ad-section">
+            <h3>📺 Advertisement</h3>
+            <div id="monetag-banner">
+                Loading ad...
+            </div>
+        </div>
+        
+        <!-- Rewarded Ads Section -->
+        <div class="ad-section">
+            <h3>🎁 Bonus Rewards</h3>
+            <button class="ad-btn" onclick="showRewardedAd('doubleCoins')" id="doubleCoinsBtn">
+                Watch Ad = 2x Coins for 30s! 
+            </button>
+            <button class="ad-btn" onclick="showRewardedAd('instantCoins')" id="instantCoinsBtn">
+                Watch Ad = 100 Instant Coins!
+            </button>
+            <button class="ad-btn" onclick="showRewardedAd('autoTapBoost')" id="autoTapBoostBtn">
+                Watch Ad = Auto-tap for 1min!
+            </button>
         </div>
         
         <div class="shop">
@@ -146,20 +221,162 @@
             upgrades: {
                 tapPower: 0,
                 autoTap: 0
-            }
+            },
+            boosts: {
+                doubleCoins: false,
+                doubleCoinsEnd: 0,
+                autoTapBoost: false,
+                autoTapBoostEnd: 0
+            },
+            lastAdWatch: 0
         };
+
+        // Ad cooldown in milliseconds (5 minutes)
+        const AD_COOLDOWN = 5 * 60 * 1000;
 
         // Initialize Telegram
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
 
+        // Initialize Monetag Ads
+        function initializeMonetag() {
+            if (typeof monetag !== 'undefined') {
+                // Banner Ad
+                monetag.banner({
+                    id: "monetag-banner",
+                    format: "horizontal", // or "vertical", "rectangle"
+                    width: 300,
+                    height: 250
+                });
+                
+                console.log('Monetag ads initialized');
+            } else {
+                console.error('Monetag SDK not loaded');
+                document.getElementById('monetag-banner').innerHTML = 'Ad network not available';
+            }
+        }
+
+        // Show rewarded ad
+        function showRewardedAd(rewardType) {
+            const now = Date.now();
+            const timeSinceLastAd = now - gameState.lastAdWatch;
+            
+            // Check cooldown
+            if (timeSinceLastAd < AD_COOLDOWN) {
+                const minutesLeft = Math.ceil((AD_COOLDOWN - timeSinceLastAd) / 60000);
+                Telegram.WebApp.showAlert(`Please wait ${minutesLeft} minutes before watching another ad.`);
+                return;
+            }
+            
+            if (typeof monetag !== 'undefined') {
+                Telegram.WebApp.showPopup({
+                    title: 'Watch Advertisement',
+                    message: 'Watch a short video to earn bonus rewards!',
+                    buttons: [
+                        {id: 'watch', type: 'default', text: 'Watch Ad'},
+                        {id: 'cancel', type: 'cancel', text: 'Cancel'}
+                    ]
+                }, function(buttonId) {
+                    if (buttonId === 'watch') {
+                        // Show rewarded ad
+                        monetag.rewarded({
+                            onStart: function() {
+                                console.log('Rewarded ad started');
+                            },
+                            onReward: function() {
+                                console.log('Rewarded ad completed');
+                                grantReward(rewardType);
+                                gameState.lastAdWatch = Date.now();
+                                updateAdButtons();
+                            },
+                            onClose: function() {
+                                console.log('Rewarded ad closed');
+                            },
+                            onError: function(error) {
+                                console.error('Rewarded ad error:', error);
+                                Telegram.WebApp.showAlert('Ad failed to load. Please try again later.');
+                            }
+                        });
+                    }
+                });
+            } else {
+                // Fallback: Simulate ad reward for testing
+                Telegram.WebApp.showAlert('Simulating ad reward for testing');
+                grantReward(rewardType);
+                gameState.lastAdWatch = Date.now();
+                updateAdButtons();
+            }
+        }
+
+        // Grant reward after ad
+        function grantReward(rewardType) {
+            switch(rewardType) {
+                case 'doubleCoins':
+                    gameState.boosts.doubleCoins = true;
+                    gameState.boosts.doubleCoinsEnd = Date.now() + 30000; // 30 seconds
+                    Telegram.WebApp.showAlert('🎉 2x Coins activated for 30 seconds!');
+                    break;
+                    
+                case 'instantCoins':
+                    gameState.coins += 100;
+                    Telegram.WebApp.showAlert('🎉 You received 100 coins!');
+                    break;
+                    
+                case 'autoTapBoost':
+                    gameState.boosts.autoTapBoost = true;
+                    gameState.boosts.autoTapBoostEnd = Date.now() + 60000; // 1 minute
+                    Telegram.WebApp.showAlert('🎉 Auto-tap boost activated for 1 minute!');
+                    break;
+            }
+            
+            updateDisplay();
+            saveGame();
+        }
+
+        // Update ad button states
+        function updateAdButtons() {
+            const now = Date.now();
+            const timeSinceLastAd = now - gameState.lastAdWatch;
+            const canWatchAd = timeSinceLastAd >= AD_COOLDOWN;
+            
+            const buttons = ['doubleCoinsBtn', 'instantCoinsBtn', 'autoTapBoostBtn'];
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (canWatchAd) {
+                    btn.disabled = false;
+                    btn.innerHTML = btn.innerHTML.replace(/\(Cooldown.*\)/, '');
+                } else {
+                    btn.disabled = true;
+                    const minutesLeft = Math.ceil((AD_COOLDOWN - timeSinceLastAd) / 60000);
+                    btn.innerHTML = btn.innerHTML.split('(')[0] + `(Cooldown: ${minutesLeft}m)`;
+                }
+            });
+        }
+
+        // Check active boosts
+        function checkBoosts() {
+            const now = Date.now();
+            
+            if (gameState.boosts.doubleCoins && now > gameState.boosts.doubleCoinsEnd) {
+                gameState.boosts.doubleCoins = false;
+                Telegram.WebApp.showAlert('2x Coins boost has ended.');
+            }
+            
+            if (gameState.boosts.autoTapBoost && now > gameState.boosts.autoTapBoostEnd) {
+                gameState.boosts.autoTapBoost = false;
+                Telegram.WebApp.showAlert('Auto-tap boost has ended.');
+            }
+        }
+
         // Load saved game
         function loadGame() {
             const saved = localStorage.getItem('coinTapperSave');
             if (saved) {
-                gameState = { ...gameState, ...JSON.parse(saved) };
+                const loadedState = JSON.parse(saved);
+                gameState = { ...gameState, ...loadedState };
             }
             updateDisplay();
+            updateAdButtons();
         }
 
         // Save game
@@ -170,7 +387,7 @@
         // Update display
         function updateDisplay() {
             document.getElementById('coins').textContent = formatNumber(gameState.coins);
-            document.getElementById('perTap').textContent = gameState.tapPower;
+            document.getElementById('perTap').textContent = gameState.tapPower + (gameState.boosts.doubleCoins ? ' (2x!)' : '');
             document.getElementById('totalTaps').textContent = gameState.totalTaps;
         }
 
@@ -187,7 +404,14 @@
 
         // Tap function
         function tap() {
-            gameState.coins += gameState.tapPower;
+            let coinsEarned = gameState.tapPower;
+            
+            // Apply 2x boost
+            if (gameState.boosts.doubleCoins) {
+                coinsEarned *= 2;
+            }
+            
+            gameState.coins += coinsEarned;
             gameState.totalTaps++;
             updateDisplay();
             saveGame();
@@ -229,8 +453,15 @@
 
         // Auto-tap system
         function autoTap() {
-            if (gameState.autoTapLevel > 0) {
-                gameState.coins += gameState.autoTapLevel;
+            let coinsEarned = gameState.autoTapLevel;
+            
+            // Apply auto-tap boost
+            if (gameState.boosts.autoTapBoost) {
+                coinsEarned += 5; // Extra coins during boost
+            }
+            
+            if (coinsEarned > 0) {
+                gameState.coins += coinsEarned;
                 updateDisplay();
                 saveGame();
             }
@@ -242,13 +473,17 @@
         // Initialize game
         loadGame();
         
-        // Set up auto-tap interval (every 5 seconds)
+        // Initialize ads after a short delay
+        setTimeout(initializeMonetag, 1000);
+        
+        // Set up intervals
         setInterval(autoTap, 5000);
+        setInterval(checkBoosts, 1000);
+        setInterval(updateAdButtons, 60000); // Update buttons every minute
 
         // Set up Telegram Main Button
         Telegram.WebApp.MainButton.setText(`Share Game`)
             .onClick(() => {
-                // This would share the game link
                 Telegram.WebApp.openTelegramLink('https://t.me/your_bot?start=game');
             })
             .show();
