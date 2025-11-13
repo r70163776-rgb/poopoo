@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>3D Car Racing - Monetized</title>
+    <title>3D Car Racing - Fixed Controls</title>
     <style>
         body {
             margin: 0;
@@ -130,13 +130,11 @@
         #double-coins-ad-btn {
             top: 80px;
             right: 10px;
-            display: none;
         }
         
         #bonus-shield-ad-btn {
             top: 120px;
             right: 10px;
-            display: none;
         }
         
         /* --- Power-up Indicators --- */
@@ -336,12 +334,6 @@
             loadingScreen.classList.add('hidden'); 
             setTimeout(() => { 
                 if (loadingScreen) loadingScreen.style.display = 'none'; 
-                // Show ad buttons after loading
-                doubleCoinsAdBtn.style.display = 'block';
-                bonusShieldAdBtn.style.display = 'block';
-                
-                // Load initial interstitial ad
-                loadInAppInterstitial();
             }, 600); 
         };
         
@@ -647,20 +639,19 @@
                 }
             }
 
-            // --- Handle Player Car Controls ---
+            // --- FIXED: Handle Player Car Controls ---
             if (carModel && carBaseY > 0) {
-                let maxBounds = roadWidth / 2 - kerbWidth - 0.1;
-                try {
-                    const box = new THREE.Box3().setFromObject(carModel);
-                    const carWidth = box.max.x - box.min.x;
-                    const carHalfWidth = carWidth / 2;
-                    maxBounds = roadWidth / 2 - kerbWidth - carHalfWidth - 0.1;
-                } catch(e) {
-                    console.warn("Could not get car bounding box size, using default bounds.");
-                }
+                // Fixed bounds calculation
+                const maxBounds = (roadWidth / 2) - 1.5; // Simple fixed bounds
 
-                if (moveLeft && carModel.position.x > -maxBounds) { carModel.position.x -= carMoveSpeed; }
-                if (moveRight && carModel.position.x < maxBounds) { carModel.position.x += carMoveSpeed; }
+                if (moveLeft) { 
+                    carModel.position.x -= carMoveSpeed; 
+                }
+                if (moveRight) { 
+                    carModel.position.x += carMoveSpeed; 
+                }
+                
+                // Apply bounds
                 carModel.position.x = Math.max(-maxBounds, Math.min(maxBounds, carModel.position.x));
 
                 // Update Player Bounding Box
@@ -705,9 +696,6 @@
                             isGameOver = true;
                             gameOverElement.style.display = 'block';
                             continueAdBtn.style.display = 'block';
-                            
-                            // Show game over interstitial
-                            loadInAppInterstitial();
                         }
                     } 
                 }
@@ -860,6 +848,6 @@
     </script>
 
     <!-- Monetag SDK -->
-    <script src="https://sdk.monetag.com/?id=YOUR_PLACEMENT_ID"></script>
+    <!-- <script src="https://sdk.monetag.com/?id=YOUR_PLACEMENT_ID"></script> -->
 </body>
 </html>
