@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jungle Escape - Endless Run</title>
+    <title>City Speed Rush - کار ریس</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a2f1a, #2d5a2d);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
             overflow: hidden;
             height: 100vh;
@@ -26,14 +26,14 @@
             height: 100vh;
             max-width: 500px;
             margin: 0 auto;
-            background: #0d1f0d;
+            background: #0a0a1a;
             overflow: hidden;
-            box-shadow: 0 0 30px rgba(0, 100, 0, 0.5);
+            box-shadow: 0 0 30px rgba(0, 100, 255, 0.5);
         }
 
         /* گیم کینوس */
         #gameCanvas {
-            background: linear-gradient(180deg, #87CEEB 0%, #2E8B57 100%);
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
             display: block;
             margin: 0 auto;
         }
@@ -58,10 +58,37 @@
             background: rgba(0, 0, 0, 0.6);
             padding: 10px 20px;
             border-radius: 20px;
-            border: 2px solid #8B4513;
+            border: 2px solid #4169E1;
             font-weight: bold;
             font-size: 1.1em;
             backdrop-filter: blur(10px);
+        }
+
+        /* سپیڈومیٹر */
+        .speedometer {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px solid #ff4444;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .speed-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ff4444;
+        }
+
+        .speed-label {
+            font-size: 0.8em;
+            color: #fff;
         }
 
         /* کنٹرولز */
@@ -71,27 +98,36 @@
             left: 0;
             right: 0;
             display: flex;
-            justify-content: center;
-            gap: 50px;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
         }
 
         .control-btn {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            background: rgba(139, 69, 19, 0.8);
-            border: 3px solid #654321;
+            background: rgba(65, 105, 225, 0.8);
+            border: 3px solid #4169E1;
             color: white;
-            font-size: 2em;
+            font-size: 1.8em;
             cursor: pointer;
             pointer-events: auto;
             transition: all 0.1s;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 15px rgba(65, 105, 225, 0.3);
         }
 
         .control-btn:active {
             transform: scale(0.9);
-            background: rgba(160, 82, 45, 0.9);
+            background: rgba(30, 144, 255, 0.9);
+        }
+
+        .action-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
         }
 
         /* پاور اپ بار */
@@ -113,7 +149,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5em;
+            font-size: 1.3em;
             opacity: 0.3;
             transition: all 0.3s;
         }
@@ -140,7 +176,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(13, 31, 13, 0.95);
+            background: rgba(10, 10, 26, 0.95);
             backdrop-filter: blur(10px);
             z-index: 100;
             text-align: center;
@@ -149,42 +185,42 @@
         .screen h1 {
             font-size: 3em;
             margin-bottom: 20px;
-            color: #32CD32;
-            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+            color: #4169E1;
+            text-shadow: 0 0 10px #4169E1, 0 0 20px #4169E1;
             animation: glow 2s ease-in-out infinite alternate;
         }
 
         @keyframes glow {
-            from { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; }
-            to { text-shadow: 0 0 15px #00ff00, 0 0 30px #00ff00, 0 0 40px #00ff00; }
+            from { text-shadow: 0 0 10px #4169E1, 0 0 20px #4169E1; }
+            to { text-shadow: 0 0 15px #4169E1, 0 0 30px #4169E1, 0 0 40px #4169E1; }
         }
 
         .screen p {
-            font-size: 1.3em;
+            font-size: 1.2em;
             margin-bottom: 30px;
             max-width: 80%;
             line-height: 1.6;
-            color: #98FB98;
+            color: #87CEEB;
         }
 
         .btn {
-            background: linear-gradient(45deg, #228B22, #32CD32);
+            background: linear-gradient(45deg, #4169E1, #6495ED);
             border: none;
             border-radius: 25px;
             padding: 15px 30px;
             color: white;
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
             margin: 10px;
             transition: all 0.3s;
-            box-shadow: 0 10px 20px rgba(34, 139, 34, 0.3);
+            box-shadow: 0 10px 20px rgba(65, 105, 225, 0.3);
             pointer-events: auto;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(34, 139, 34, 0.4);
+            box-shadow: 0 15px 30px rgba(65, 105, 225, 0.4);
         }
 
         .ad-btn {
@@ -197,44 +233,88 @@
             display: none;
         }
 
-        /* پارٹیکل ایفیکٹس */
-        .particle {
-            position: absolute;
-            pointer-events: none;
-            border-radius: 50%;
-        }
-
-        /* درخت اور پودے */
-        .tree, .bush {
-            position: absolute;
-            pointer-events: none;
-        }
-
-        /* کوسٹیوم سلیکشن */
-        .costume-selection {
+        /* کار سلیکشن */
+        .car-selection {
             display: flex;
             gap: 15px;
             margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .costume-option {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+        .car-option {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid transparent;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5em;
+            font-size: 2em;
             transition: all 0.3s;
+            position: relative;
         }
 
-        .costume-option.selected {
-            border-color: #32CD32;
-            box-shadow: 0 0 15px #32CD32;
+        .car-option.selected {
+            border-color: #4169E1;
+            box-shadow: 0 0 20px #4169E1;
             transform: scale(1.1);
+        }
+
+        .car-name {
+            position: absolute;
+            bottom: -25px;
+            font-size: 0.7em;
+            color: #87CEEB;
+        }
+
+        /* اپ گریڈ سسٹم */
+        .upgrade-store {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            max-width: 90%;
+        }
+
+        .upgrade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .upgrade-info {
+            flex: 1;
+        }
+
+        .upgrade-name {
+            font-weight: bold;
+            color: #4169E1;
+        }
+
+        .upgrade-level {
+            font-size: 0.9em;
+            color: #87CEEB;
+        }
+
+        .upgrade-btn {
+            background: #4169E1;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 15px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .upgrade-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -247,60 +327,100 @@
         <div class="ui-overlay">
             <div class="stats">
                 <div class="stat-box">🪙 سکے: <span id="coins">0</span></div>
-                <div class="stat-box">📊 اسکور: <span id="score">0</span></div>
+                <div class="stat-box">📊 فاصلہ: <span id="distance">0</span>m</div>
                 <div class="stat-box">🔥 ہائی اسکور: <span id="highScore">0</span></div>
             </div>
+        </div>
+
+        <!-- سپیڈومیٹر -->
+        <div class="speedometer">
+            <div class="speed-value" id="speed">0</div>
+            <div class="speed-label">KM/H</div>
         </div>
 
         <!-- پاور اپ بار -->
         <div class="powerup-bar">
             <div class="powerup-indicator" id="shieldIndicator">🛡️</div>
-            <div class="powerup-indicator" id="speedIndicator">⚡</div>
+            <div class="powerup-indicator" id="boostIndicator">⚡</div>
             <div class="powerup-indicator" id="magnetIndicator">🧲</div>
             <div class="powerup-indicator" id="doubleIndicator">2×</div>
         </div>
 
         <!-- کنٹرولز -->
         <div class="controls">
-            <button class="control-btn" onclick="jump()">↑</button>
-            <button class="control-btn" onclick="slide()">↓</button>
-            <button class="control-btn" onclick="usePowerup()">💥</button>
+            <div class="control-group">
+                <button class="control-btn" onclick="moveLeft()">←</button>
+                <button class="control-btn" onclick="moveRight()">→</button>
+            </div>
+            <div class="control-group">
+                <button class="control-btn action-btn" onclick="useBoost()">🚀</button>
+                <button class="control-btn action-btn" onclick="useShield()">🛡️</button>
+            </div>
         </div>
 
         <!-- اسٹارٹ اسکرین -->
         <div id="startScreen" class="screen">
-            <h1>🌴 Jungle Escape</h1>
-            <p>خطرناک جنگل سے بھاگو، رکاوٹیں پار کرو، اور قیمتی خزانے جمع کرو!</p>
+            <h1>🏎️ City Speed Rush</h1>
+            <p>شہر کی سڑکوں پر تیز رفتار دوڑ، رکاوٹیں پار کرو، اور سکے جمع کرو!</p>
             
-            <div class="costume-selection">
-                <div class="costume-option selected" onclick="selectCostume('explorer')">🧑‍🌾</div>
-                <div class="costume-option" onclick="selectCostume('adventurer')">🧑‍🚀</div>
-                <div class="costume-option" onclick="selectCostume('ninja')">🥷</div>
-                <div class="costume-option" onclick="selectCostume('athlete')">🏃‍♂️</div>
+            <div class="car-selection">
+                <div class="car-option selected" onclick="selectCar('sports')">
+                    🏎️
+                    <div class="car-name">سپورٹس</div>
+                </div>
+                <div class="car-option" onclick="selectCar('muscle')">
+                    🚗
+                    <div class="car-name">مسل</div>
+                </div>
+                <div class="car-option" onclick="selectCar('super')">
+                    🚀
+                    <div class="car-name">سپرکار</div>
+                </div>
+                <div class="car-option" onclick="selectCar('truck')">
+                    🚚
+                    <div class="car-name">ٹرک</div>
+                </div>
             </div>
 
-            <button class="btn" onclick="startGame()">بھاگو!</button>
-            <button class="btn ad-btn" onclick="watchAdForStartingBonus()">🎁 500 سکے + شیلڈ حاصل کریں</button>
+            <div class="upgrade-store">
+                <h3>🚀 اپ گریڈز</h3>
+                <div class="upgrade-item">
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">سپیڈ</div>
+                        <div class="upgrade-level">لیول: <span id="speedLevel">1</span></div>
+                    </div>
+                    <button class="upgrade-btn" onclick="upgradeSpeed()">100 🪙</button>
+                </div>
+                <div class="upgrade-item">
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">کنٹرول</div>
+                        <div class="upgrade-level">لیول: <span id="controlLevel">1</span></div>
+                    </div>
+                    <button class="upgrade-btn" onclick="upgradeControl()">80 🪙</button>
+                </div>
+            </div>
+
+            <button class="btn" onclick="startGame()">ریس شروع کریں!</button>
+            <button class="btn ad-btn" onclick="watchAdForStartingBonus()">🎁 500 سکے + بووسٹ حاصل کریں</button>
+        </div>
+
+        <!-- گیم اوور اسکرین -->
+        <div id="gameOverScreen" class="screen hidden">
+            <h1>💥 حادثہ!</h1>
+            <p>کل فاصلہ: <span id="finalDistance">0</span>m</p>
+            <p>جمع کردہ سکے: <span id="finalCoins">0</span></p>
+            <p>زیادہ سے زیادہ فاصلہ: <span id="finalHighScore">0</span>m</p>
+            
+            <button class="btn" onclick="restartGame()">دوبارہ کوشش کریں</button>
+            <button class="btn ad-btn" onclick="watchAdToContinue()">🎬 اشتہار دیکھ کر جاری رکھیں</button>
+            <button class="btn ad-btn" onclick="watchAdForDoubleCoins()">💰 اشتہار دیکھ کر سکے دگنا کریں</button>
         </div>
 
         <!-- پاز اسکرین -->
         <div id="pauseScreen" class="screen hidden">
             <h1>⏸️ روکا گیا</h1>
-            <p>کھیل روکا گیا ہے</p>
             <button class="btn" onclick="resumeGame()">جاری رکھیں</button>
             <button class="btn" onclick="restartGame()">دوبارہ شروع کریں</button>
-        </div>
-
-        <!-- گیم اوور اسکرین -->
-        <div id="gameOverScreen" class="screen hidden">
-            <h1>💀 جنگل نے پکڑ لیا!</h1>
-            <p>آپ کا اسکور: <span id="finalScore">0</span></p>
-            <p>جمع کردہ سکے: <span id="finalCoins">0</span></p>
-            <p>زیادہ سے زیادہ اسکور: <span id="finalHighScore">0</span></p>
-            
-            <button class="btn" onclick="restartGame()">دوبارہ کوشش کریں</button>
-            <button class="btn ad-btn" onclick="watchAdToContinue()">🎬 اشتہار دیکھ کر جاری رکھیں</button>
-            <button class="btn ad-btn" onclick="watchAdForDoubleRewards()">💰 اشتہار دیکھ کر انعام دگنا کریں</button>
         </div>
     </div>
 
@@ -309,20 +429,33 @@
         let gameActive = false;
         let gamePaused = false;
         let coins = 0;
-        let score = 0;
+        let distance = 0;
         let highScore = 0;
         let gameSpeed = 5;
-        let player = { x: 100, y: 600, width: 50, height: 80, velocityY: 0, isJumping: false, isSliding: false };
+        let carSpeed = 0;
+        let playerX = 250;
+        let selectedCar = 'sports';
+        let upgrades = {
+            speed: { level: 1, cost: 100 },
+            control: { level: 1, cost: 80 }
+        };
+        let activePowerups = {};
         let obstacles = [];
         let coinsArray = [];
         let powerups = [];
-        let activePowerups = {};
-        let backgroundElements = [];
-        let selectedCostume = 'explorer';
+        let trafficCars = [];
 
         // === کینوس سیٹ اپ ===
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+
+        // کار کی خصوصیات
+        const carStats = {
+            sports: { speed: 8, control: 7, color: '#FF4444' },
+            muscle: { speed: 6, control: 8, color: '#4169E1' },
+            super: { speed: 10, control: 6, color: '#FFD700' },
+            truck: { speed: 4, control: 9, color: '#32CD32' }
+        };
 
         // === گیم شروع کریں ===
         function startGame() {
@@ -330,65 +463,24 @@
             gameActive = true;
             gamePaused = false;
             coins = 0;
-            score = 0;
-            gameSpeed = 5;
+            distance = 0;
+            carSpeed = 0;
+            playerX = 250;
             
             initializeGame();
             gameLoop();
             startSpawning();
             
-            // گیم شروع ہونے پر In-App Interstitial
+            updateUI();
             loadInAppInterstitial();
         }
 
         function initializeGame() {
-            player = { 
-                x: 100, 
-                y: 600, 
-                width: 50, 
-                height: 80, 
-                velocityY: 0, 
-                isJumping: false, 
-                isSliding: false,
-                normalHeight: 80,
-                slideHeight: 40
-            };
-            
             obstacles = [];
             coinsArray = [];
             powerups = [];
+            trafficCars = [];
             activePowerups = {};
-            backgroundElements = [];
-            
-            createBackground();
-            updateUI();
-        }
-
-        // === بیک گراؤنڈ بنائیں ===
-        function createBackground() {
-            // درخت بنائیں
-            for(let i = 0; i < 10; i++) {
-                backgroundElements.push({
-                    type: 'tree',
-                    x: Math.random() * canvas.width,
-                    y: canvas.height - 150,
-                    width: 60,
-                    height: 150,
-                    speed: gameSpeed * 0.3
-                });
-            }
-            
-            // پودے بنائیں
-            for(let i = 0; i < 20; i++) {
-                backgroundElements.push({
-                    type: 'bush',
-                    x: Math.random() * canvas.width,
-                    y: canvas.height - 50,
-                    width: 40,
-                    height: 40,
-                    speed: gameSpeed * 0.5
-                });
-            }
         }
 
         // === گیم لوپ ===
@@ -398,144 +490,135 @@
             // کینوس صاف کریں
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // بیک گراؤنڈ ڈرائیں
-            drawBackground();
+            // سڑک ڈرائیں
+            drawRoad();
             
-            // کشش ثقل لاگو کریں
-            applyGravity();
-            
-            // تمام آئٹمز کو حرکت دیں
+            // گیم ایلیمنٹس حرکت دیں
             moveGameElements();
             
-            // تصادم کا پتہ لگائیں
+            // تصادم چیک کریں
             checkCollisions();
             
-            // اسکور اور سپیڈ بڑھائیں
+            // گیم اسٹیٹس اپ ڈیٹ کریں
             updateGameStats();
             
-            // کھلاڑی اور آئٹمز ڈرائیں
-            drawPlayer();
-            drawObstacles();
-            drawCoins();
-            drawPowerups();
+            // تمام ایلیمنٹس ڈرائیں
+            drawGameElements();
             
             // اگلا فریم
             requestAnimationFrame(gameLoop);
         }
 
-        // === بیک گراؤنڈ ڈرائیں ===
-        function drawBackground() {
-            // آسمان
-            ctx.fillStyle = '#87CEEB';
+        // === سڑک ڈرائیں ===
+        function drawRoad() {
+            // سڑک کا بیج
+            ctx.fillStyle = '#333333';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // زمین
-            ctx.fillStyle = '#8B4513';
-            ctx.fillRect(0, canvas.height - 100, canvas.width, 100);
+            // سڑک کی لکیریں
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 5;
+            ctx.setLineDash([20, 20]);
             
-            ctx.fillStyle = '#2E8B57';
-            ctx.fillRect(0, canvas.height - 100, canvas.width, 20);
-            
-            // بیک گراؤنڈ ایلیمنٹس
-            backgroundElements.forEach(element => {
-                if(element.type === 'tree') {
-                    ctx.fillStyle = '#8B4513';
-                    ctx.fillRect(element.x, element.y, 20, element.height);
-                    ctx.fillStyle = '#228B22';
-                    ctx.beginPath();
-                    ctx.arc(element.x + 10, element.y, 40, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if(element.type === 'bush') {
-                    ctx.fillStyle = '#32CD32';
-                    ctx.beginPath();
-                    ctx.arc(element.x + 20, element.y + 20, 20, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                
-                // حرکت دیں
-                element.x -= element.speed;
-                if(element.x < -100) {
-                    element.x = canvas.width + Math.random() * 100;
-                }
-            });
-        }
-
-        // === کشش ثقل لاگو کریں ===
-        function applyGravity() {
-            if(player.isJumping) {
-                player.velocityY += 0.8;
-                player.y += player.velocityY;
-                
-                if(player.y >= 600) {
-                    player.y = 600;
-                    player.velocityY = 0;
-                    player.isJumping = false;
-                    player.isSliding = false;
-                    player.height = player.normalHeight;
-                }
+            for(let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(150 + i * 100, 0);
+                ctx.lineTo(150 + i * 100, canvas.height);
+                ctx.stroke();
             }
+            ctx.setLineDash([]);
+            
+            // سڑک کے کنارے
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, 0, 50, canvas.height);
+            ctx.fillRect(canvas.width - 50, 0, 50, canvas.height);
         }
 
-        // === گیم ایلیمنٹس کو حرکت دیں ===
+        // === گیم ایلیمنٹس حرکت دیں ===
         function moveGameElements() {
+            // فاصلہ اور سپیڈ بڑھائیں
+            distance += carSpeed / 10;
+            carSpeed = Math.min(carSpeed + 0.1, getMaxSpeed());
+            
             // رکاوٹیں حرکت دیں
             obstacles.forEach((obstacle, index) => {
-                obstacle.x -= gameSpeed;
-                if(obstacle.x < -100) {
+                obstacle.y += gameSpeed + carSpeed / 2;
+                if(obstacle.y > canvas.height) {
                     obstacles.splice(index, 1);
                 }
             });
             
             // سکے حرکت دیں
             coinsArray.forEach((coin, index) => {
-                coin.x -= gameSpeed;
-                if(coin.x < -50) {
+                coin.y += gameSpeed + carSpeed / 2;
+                if(coin.y > canvas.height) {
                     coinsArray.splice(index, 1);
                 }
             });
             
             // پاور اپس حرکت دیں
             powerups.forEach((powerup, index) => {
-                powerup.x -= gameSpeed;
-                if(powerup.x < -50) {
+                powerup.y += gameSpeed + carSpeed / 2;
+                if(powerup.y > canvas.height) {
                     powerups.splice(index, 1);
+                }
+            });
+            
+            // ٹریفک کارز حرکت دیں
+            trafficCars.forEach((car, index) => {
+                car.y += gameSpeed;
+                if(car.y > canvas.height) {
+                    trafficCars.splice(index, 1);
                 }
             });
         }
 
-        // === تصادم کا پتہ لگائیں ===
+        // === تصادم چیک کریں ===
         function checkCollisions() {
+            const playerRect = {
+                x: playerX - 20,
+                y: canvas.height - 100,
+                width: 40,
+                height: 80
+            };
+
             // رکاوٹوں سے تصادم
             obstacles.forEach(obstacle => {
-                if(isColliding(player, obstacle)) {
+                if(isColliding(playerRect, obstacle)) {
                     if(!activePowerups.shield) {
                         endGame();
                     } else {
-                        // شیلڈ ہونے پر رکاوٹ کو ہٹا دیں
                         obstacles = obstacles.filter(obs => obs !== obstacle);
-                        createParticles(obstacle.x + 25, obstacle.y + 25, 15, '#ff4444');
                     }
                 }
             });
-            
+
+            // ٹریفک کارز سے تصادم
+            trafficCars.forEach(car => {
+                if(isColliding(playerRect, car)) {
+                    if(!activePowerups.shield) {
+                        endGame();
+                    } else {
+                        trafficCars = trafficCars.filter(c => c !== car);
+                    }
+                }
+            });
+
             // سکے جمع کریں
             coinsArray.forEach((coin, index) => {
-                if(isColliding(player, coin)) {
+                if(isColliding(playerRect, coin)) {
                     const coinValue = activePowerups.doubleCoins ? 2 : 1;
                     coins += coinValue;
-                    score += 10 * coinValue;
                     coinsArray.splice(index, 1);
-                    createParticles(coin.x + 15, coin.y + 15, 8, '#ffd700');
                     updateUI();
                 }
             });
-            
+
             // پاور اپس جمع کریں
             powerups.forEach((powerup, index) => {
-                if(isColliding(player, powerup)) {
+                if(isColliding(playerRect, powerup)) {
                     activatePowerup(powerup.type);
                     powerups.splice(index, 1);
-                    createParticles(powerup.x + 20, powerup.y + 20, 12, getPowerupColor(powerup.type));
                 }
             });
         }
@@ -548,101 +631,145 @@
                    rect1.y + rect1.height > rect2.y;
         }
 
-        // === گیم اسٹیٹس اپ ڈیٹ ===
-        function updateGameStats() {
-            score += Math.floor(gameSpeed / 2);
+        // === گیم ایلیمنٹس ڈرائیں ===
+        function drawGameElements() {
+            // کھلاڑی کی کار ڈرائیں
+            drawPlayerCar();
             
-            // ہر 1000 اسکور پر سپیڈ بڑھائیں
-            if(score % 1000 === 0 && gameSpeed < 15) {
-                gameSpeed += 0.5;
-            }
+            // رکاوٹیں ڈرائیں
+            obstacles.forEach(drawObstacle);
             
-            updateUI();
+            // سکے ڈرائیں
+            coinsArray.forEach(drawCoin);
+            
+            // پاور اپس ڈرائیں
+            powerups.forEach(drawPowerup);
+            
+            // ٹریفک کارز ڈرائیں
+            trafficCars.forEach(drawTrafficCar);
         }
 
-        // === کھلاڑی ڈرائیں ===
-        function drawPlayer() {
-            ctx.fillStyle = getCostumeColor();
+        // === کھلاڑی کی کار ڈرائیں ===
+        function drawPlayerCar() {
+            const carColor = carStats[selectedCar].color;
             
-            if(player.isSliding) {
-                // سلائیڈنگ پوزیشن
-                ctx.fillRect(player.x, player.y + 40, player.width, player.slideHeight);
-            } else {
-                // عام پوزیشن
-                ctx.fillRect(player.x, player.y, player.width, player.height);
-                
-                // کھلاڑی کی شکل بنائیں
-                ctx.fillStyle = '#000';
-                ctx.fillRect(player.x + 10, player.y + 15, 10, 10); // بائیں آنکھ
-                ctx.fillRect(player.x + 30, player.y + 15, 10, 10); // دائیں آنکھ
-                ctx.fillRect(player.x + 15, player.y + 35, 20, 5); // منہ
-            }
+            // کار کا جسم
+            ctx.fillStyle = carColor;
+            ctx.fillRect(playerX - 20, canvas.height - 100, 40, 80);
             
-            // ایکٹو پاور اپس کے ایفیکٹس
+            // کار کی کھڑکی
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(playerX - 15, canvas.height - 90, 30, 40);
+            
+            // پہیے
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(playerX - 25, canvas.height - 100, 10, 20);
+            ctx.fillRect(playerX + 15, canvas.height - 100, 10, 20);
+            ctx.fillRect(playerX - 25, canvas.height - 20, 10, 20);
+            ctx.fillRect(playerX + 15, canvas.height - 20, 10, 20);
+            
+            // شیلڈ ایفیکٹ
             if(activePowerups.shield) {
                 ctx.strokeStyle = '#00ffff';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
-                ctx.arc(player.x + 25, player.y + 40, 45, 0, Math.PI * 2);
+                ctx.arc(playerX, canvas.height - 60, 50, 0, Math.PI * 2);
                 ctx.stroke();
+            }
+            
+            // بووسٹ ایفیکٹ
+            if(activePowerups.boost) {
+                ctx.fillStyle = '#ff4444';
+                ctx.beginPath();
+                ctx.moveTo(playerX - 10, canvas.height);
+                ctx.lineTo(playerX, canvas.height + 30);
+                ctx.lineTo(playerX + 10, canvas.height);
+                ctx.fill();
             }
         }
 
-        // === رکاوٹیں ڈرائیں ===
-        function drawObstacles() {
-            obstacles.forEach(obstacle => {
-                ctx.fillStyle = obstacle.color;
-                
-                if(obstacle.type === 'rock') {
-                    ctx.beginPath();
-                    ctx.arc(obstacle.x + 25, obstacle.y + 25, 25, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if(obstacle.type === 'tree') {
-                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-                } else if(obstacle.type === 'pit') {
-                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-                }
-            });
+        // === رکاوٹ ڈرائیں ===
+        function drawObstacle(obstacle) {
+            ctx.fillStyle = obstacle.color;
+            
+            if(obstacle.type === 'cone') {
+                // ٹریفک کون
+                ctx.fillStyle = '#FFA500';
+                ctx.beginPath();
+                ctx.moveTo(obstacle.x, obstacle.y + obstacle.height);
+                ctx.lineTo(obstacle.x + obstacle.width/2, obstacle.y);
+                ctx.lineTo(obstacle.x + obstacle.width, obstacle.y + obstacle.height);
+                ctx.closePath();
+                ctx.fill();
+            } else if(obstacle.type === 'barrier') {
+                // بیرئر
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            } else if(obstacle.type === 'pothole') {
+                // گڑھا
+                ctx.fillStyle = '#000000';
+                ctx.beginPath();
+                ctx.arc(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2, obstacle.width/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
-        // === سکے ڈرائیں ===
-        function drawCoins() {
-            coinsArray.forEach(coin => {
-                ctx.fillStyle = '#ffd700';
-                ctx.beginPath();
-                ctx.arc(coin.x + 15, coin.y + 15, 15, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.fillStyle = '#ff6b00';
-                ctx.beginPath();
-                ctx.arc(coin.x + 15, coin.y + 15, 10, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 16px Arial';
-                ctx.fillText('$', coin.x + 10, coin.y + 20);
-            });
+        // === سکہ ڈرائیں ===
+        function drawCoin(coin) {
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(coin.x + coin.width/2, coin.y + coin.height/2, coin.width/2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#FF6B00';
+            ctx.beginPath();
+            ctx.arc(coin.x + coin.width/2, coin.y + coin.height/2, coin.width/3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('$', coin.x + coin.width/2 - 4, coin.y + coin.height/2 + 4);
         }
 
-        // === پاور اپس ڈرائیں ===
-        function drawPowerups() {
-            powerups.forEach(powerup => {
-                ctx.fillStyle = getPowerupColor(powerup.type);
-                ctx.fillRect(powerup.x, powerup.y, powerup.width, powerup.height);
-                
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 20px Arial';
-                
-                let symbol = '';
-                switch(powerup.type) {
-                    case 'shield': symbol = '🛡️'; break;
-                    case 'speed': symbol = '⚡'; break;
-                    case 'magnet': symbol = '🧲'; break;
-                    case 'double': symbol = '2×'; break;
-                }
-                
-                ctx.fillText(symbol, powerup.x + 10, powerup.y + 25);
-            });
+        // === پاور اپ ڈرائیں ===
+        function drawPowerup(powerup) {
+            const colors = {
+                shield: '#00ffff',
+                boost: '#ffff00',
+                magnet: '#ff4444',
+                double: '#00ff00'
+            };
+            
+            ctx.fillStyle = colors[powerup.type];
+            ctx.fillRect(powerup.x, powerup.y, powerup.width, powerup.height);
+            
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 16px Arial';
+            
+            let symbol = '';
+            switch(powerup.type) {
+                case 'shield': symbol = '🛡️'; break;
+                case 'boost': symbol = '⚡'; break;
+                case 'magnet': symbol = '🧲'; break;
+                case 'double': symbol = '2×'; break;
+            }
+            
+            ctx.fillText(symbol, powerup.x + 8, powerup.y + 25);
+        }
+
+        // === ٹریفک کار ڈرائیں ===
+        function drawTrafficCar(car) {
+            ctx.fillStyle = car.color;
+            ctx.fillRect(car.x - 25, car.y, 50, 80);
+            
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(car.x - 20, car.y + 10, 40, 30);
+            
+            // پہیے
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(car.x - 30, car.y, 10, 20);
+            ctx.fillRect(car.x + 20, car.y, 10, 20);
+            ctx.fillRect(car.x - 30, car.y + 60, 10, 20);
+            ctx.fillRect(car.x + 20, car.y + 60, 10, 20);
         }
 
         // === سپانس سسٹم ===
@@ -652,118 +779,109 @@
                 if(gameActive && !gamePaused) {
                     spawnObstacle();
                 }
-            }, 1500);
+            }, 2000);
             
             // سکے سپانس کریں
             setInterval(() => {
                 if(gameActive && !gamePaused) {
                     spawnCoin();
                 }
-            }, 800);
+            }, 1000);
             
             // پاور اپس سپانس کریں
             setInterval(() => {
-                if(gameActive && !gamePaused && Math.random() < 0.3) {
+                if(gameActive && !gamePaused && Math.random() < 0.2) {
                     spawnPowerup();
                 }
             }, 5000);
+            
+            // ٹریفک کارز سپانس کریں
+            setInterval(() => {
+                if(gameActive && !gamePaused) {
+                    spawnTrafficCar();
+                }
+            }, 3000);
         }
 
         function spawnObstacle() {
-            const types = ['rock', 'tree', 'pit'];
+            const types = ['cone', 'barrier', 'pothole'];
             const type = types[Math.floor(Math.random() * types.length)];
+            const lanes = [100, 200, 300, 400];
             
-            let obstacle;
-            switch(type) {
-                case 'rock':
-                    obstacle = {
-                        type: 'rock',
-                        x: canvas.width,
-                        y: canvas.height - 100,
-                        width: 50,
-                        height: 50,
-                        color: '#696969'
-                    };
-                    break;
-                case 'tree':
-                    obstacle = {
-                        type: 'tree',
-                        x: canvas.width,
-                        y: canvas.height - 150,
-                        width: 30,
-                        height: 100,
-                        color: '#8B4513'
-                    };
-                    break;
-                case 'pit':
-                    obstacle = {
-                        type: 'pit',
-                        x: canvas.width,
-                        y: canvas.height - 50,
-                        width: 80,
-                        height: 50,
-                        color: '#000000'
-                    };
-                    break;
-            }
+            const obstacle = {
+                type: type,
+                x: lanes[Math.floor(Math.random() * lanes.length)],
+                y: -50,
+                width: 40,
+                height: 40,
+                color: type === 'cone' ? '#FFA500' : type === 'barrier' ? '#FF4444' : '#000000'
+            };
             
             obstacles.push(obstacle);
         }
 
         function spawnCoin() {
+            const lanes = [100, 200, 300, 400];
+            
             coinsArray.push({
-                x: canvas.width,
-                y: Math.random() * 400 + 200,
+                x: lanes[Math.floor(Math.random() * lanes.length)],
+                y: -30,
                 width: 30,
                 height: 30
             });
         }
 
         function spawnPowerup() {
-            const types = ['shield', 'speed', 'magnet', 'double'];
+            const types = ['shield', 'boost', 'magnet', 'double'];
             const type = types[Math.floor(Math.random() * types.length)];
+            const lanes = [100, 200, 300, 400];
             
             powerups.push({
                 type: type,
-                x: canvas.width,
-                y: Math.random() * 400 + 200,
+                x: lanes[Math.floor(Math.random() * lanes.length)],
+                y: -40,
                 width: 40,
                 height: 40
             });
         }
 
+        function spawnTrafficCar() {
+            const lanes = [100, 200, 300, 400];
+            const colors = ['#FF4444', '#4169E1', '#32CD32', '#FFD700', '#8A2BE2'];
+            
+            trafficCars.push({
+                x: lanes[Math.floor(Math.random() * lanes.length)],
+                y: -100,
+                width: 50,
+                height: 80,
+                color: colors[Math.floor(Math.random() * colors.length)]
+            });
+        }
+
         // === کنٹرولز ===
-        function jump() {
-            if(gameActive && !gamePaused && !player.isJumping) {
-                player.velocityY = -20;
-                player.isJumping = true;
-                player.isSliding = false;
-                player.height = player.normalHeight;
-            }
-        }
-
-        function slide() {
-            if(gameActive && !gamePaused && !player.isJumping) {
-                player.isSliding = true;
-                player.height = player.slideHeight;
-                
-                setTimeout(() => {
-                    if(player.isSliding && !player.isJumping) {
-                        player.isSliding = false;
-                        player.height = player.normalHeight;
-                    }
-                }, 1000);
-            }
-        }
-
-        function usePowerup() {
+        function moveLeft() {
             if(gameActive && !gamePaused) {
-                // سپیشل پاور اپ ایکٹیویٹ کریں
-                if(coins >= 100) {
-                    coins -= 100;
-                    activatePowerup('super');
-                    updateUI();
-                }
+                const control = carStats[selectedCar].control + upgrades.control.level;
+                playerX = Math.max(75, playerX - control);
+            }
+        }
+
+        function moveRight() {
+            if(gameActive && !gamePaused) {
+                const control = carStats[selectedCar].control + upgrades.control.level;
+                playerX = Math.min(425, playerX + control);
+            }
+        }
+
+        function useBoost() {
+            if(gameActive && !gamePaused && !activePowerups.boost) {
+                activatePowerup('boost');
+            }
+        }
+
+        function useShield() {
+            if(gameActive && !gamePaused && !activePowerups.shield) {
+                activatePowerup('shield');
             }
         }
 
@@ -772,100 +890,104 @@
             activePowerups[type] = {
                 active: true,
                 startTime: Date.now(),
-                duration: 10000 // 10 سیکنڈ
+                duration: 8000
             };
             
-            // انڈیکیٹر ایکٹیو کریں
             document.getElementById(type + 'Indicator').classList.add('active');
             
-            // ایفیکٹس لاگو کریں
+            // ایفیکٹس
             switch(type) {
+                case 'boost':
+                    carSpeed = Math.min(carSpeed + 5, getMaxSpeed() + 5);
+                    break;
                 case 'shield':
-                    break;
-                case 'speed':
-                    gameSpeed += 3;
-                    break;
-                case 'magnet':
-                    break;
-                case 'double':
-                    break;
-                case 'super':
-                    // سپیشل ایفیکٹ
-                    gameSpeed += 5;
-                    coins += 50;
+                    // شیلڈ کا کام خود تصادم میں ہو رہا ہے
                     break;
             }
             
-            // ڈیوریشن کے بعد ختم کریں
             setTimeout(() => {
                 if(activePowerups[type]) {
                     activePowerups[type].active = false;
                     document.getElementById(type + 'Indicator').classList.remove('active');
-                    
-                    if(type === 'speed') {
-                        gameSpeed -= 3;
-                    }
                 }
-            }, 10000);
+            }, 8000);
         }
 
-        // === پارٹیکل ایفیکٹس ===
-        function createParticles(x, y, count, color) {
-            for(let i = 0; i < count; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = x + 'px';
-                particle.style.top = y + 'px';
-                particle.style.width = '8px';
-                particle.style.height = '8px';
-                particle.style.background = color;
-                
-                document.querySelector('.game-container').appendChild(particle);
-                
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 5 + 2;
-                const vx = Math.cos(angle) * speed;
-                const vy = Math.sin(angle) * speed;
-                
-                let opacity = 1;
-                const fadeInterval = setInterval(() => {
-                    opacity -= 0.05;
-                    particle.style.opacity = opacity;
-                    particle.style.left = (parseFloat(particle.style.left) + vx) + 'px';
-                    particle.style.top = (parseFloat(particle.style.top) + vy) + 'px';
-                    
-                    if(opacity <= 0) {
-                        particle.remove();
-                        clearInterval(fadeInterval);
-                    }
-                }, 50);
+        // === اپ گریڈ سسٹم ===
+        function upgradeSpeed() {
+            if(coins >= upgrades.speed.cost) {
+                coins -= upgrades.speed.cost;
+                upgrades.speed.level++;
+                upgrades.speed.cost = Math.floor(upgrades.speed.cost * 1.5);
+                updateUI();
+                updateUpgradeButtons();
             }
         }
 
-        // === UI اپ ڈیٹ ===
+        function upgradeControl() {
+            if(coins >= upgrades.control.cost) {
+                coins -= upgrades.control.cost;
+                upgrades.control.level++;
+                upgrades.control.cost = Math.floor(upgrades.control.cost * 1.5);
+                updateUI();
+                updateUpgradeButtons();
+            }
+        }
+
+        function updateUpgradeButtons() {
+            document.getElementById('speedLevel').textContent = upgrades.speed.level;
+            document.getElementById('controlLevel').textContent = upgrades.control.level;
+            
+            document.querySelectorAll('.upgrade-btn').forEach(btn => {
+                const cost = parseInt(btn.textContent);
+                btn.disabled = coins < cost;
+            });
+        }
+
+        // === گیم اسٹیٹس اپ ڈیٹ ===
+        function updateGameStats() {
+            document.getElementById('distance').textContent = Math.floor(distance);
+            document.getElementById('speed').textContent = Math.floor(carSpeed * 20);
+            
+            // ہر 1000m پر سپیڈ بڑھائیں
+            if(distance % 1000 === 0 && gameSpeed < 15) {
+                gameSpeed += 0.5;
+            }
+        }
+
         function updateUI() {
             document.getElementById('coins').textContent = coins;
-            document.getElementById('score').textContent = score;
+            document.getElementById('distance').textContent = Math.floor(distance);
             document.getElementById('highScore').textContent = highScore;
+        }
+
+        // === ہیلپر فنکشنز ===
+        function getMaxSpeed() {
+            return carStats[selectedCar].speed + upgrades.speed.level;
+        }
+
+        function selectCar(carType) {
+            selectedCar = carType;
+            document.querySelectorAll('.car-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
         }
 
         // === گیم ختم ===
         function endGame() {
             gameActive = false;
             
-            if(score > highScore) {
-                highScore = score;
-                localStorage.setItem('jungleHighScore', highScore);
+            if(distance > highScore) {
+                highScore = Math.floor(distance);
+                localStorage.setItem('carHighScore', highScore);
             }
             
-            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalDistance').textContent = Math.floor(distance);
             document.getElementById('finalCoins').textContent = coins;
             document.getElementById('finalHighScore').textContent = highScore;
             document.getElementById('gameOverScreen').classList.remove('hidden');
             
-            createParticles(player.x + 25, player.y + 40, 30, '#ff4444');
-            
-            // گیم ختم ہونے پر In-App Interstitial
             loadInAppInterstitial();
         }
 
@@ -882,52 +1004,24 @@
             gameLoop();
         }
 
-        // === کوسٹیوم سلیکشن ===
-        function selectCostume(costume) {
-            selectedCostume = costume;
-            document.querySelectorAll('.costume-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            event.target.classList.add('selected');
-        }
-
-        function getCostumeColor() {
-            switch(selectedCostume) {
-                case 'explorer': return '#8B4513';
-                case 'adventurer': return '#4169E1';
-                case 'ninja': return '#2F4F4F';
-                case 'athlete': return '#FF6347';
-                default: return '#8B4513';
-            }
-        }
-
-        function getPowerupColor(type) {
-            switch(type) {
-                case 'shield': return '#00ffff';
-                case 'speed': return '#ffff00';
-                case 'magnet': return '#ff4444';
-                case 'double': return '#00ff00';
-                default: return '#ffffff';
-            }
-        }
-
         // === اشتہارات کے افعال ===
         function watchAdForStartingBonus() {
             if(typeof monetag !== 'undefined') {
                 monetag.showAd('rewarded-popup', {
                     onReward: function() {
                         coins += 500;
-                        activatePowerup('shield');
+                        activatePowerup('boost');
                         updateUI();
-                        alert('🎉 مبارک ہو! آپ کو 500 سکے اور شیلڈ ملا!');
+                        updateUpgradeButtons();
+                        alert('🎉 مبارک ہو! آپ کو 500 سکے اور بووسٹ ملا!');
                     }
                 });
             } else {
-                // ڈیمو کے لیے
                 coins += 500;
-                activatePowerup('shield');
+                activatePowerup('boost');
                 updateUI();
-                alert('[DEMO] 🎉 مبارک ہو! آپ کو 500 سکے اور شیلڈ ملا!');
+                updateUpgradeButtons();
+                alert('[DEMO] 🎉 مبارک ہو! آپ کو 500 سکے اور بووسٹ ملا!');
             }
         }
 
@@ -937,44 +1031,34 @@
                     onReward: function() {
                         document.getElementById('gameOverScreen').classList.add('hidden');
                         gameActive = true;
-                        player.y = 600;
-                        player.velocityY = 0;
-                        player.isJumping = false;
                         activatePowerup('shield');
                         gameLoop();
-                        alert('🚀 کھیل جاری ہے! آپ کو دوسرا موقع ملا!');
+                        alert('🚀 ریس جاری ہے! آپ کو دوسرا موقع ملا!');
                     }
                 });
             } else {
-                // ڈیمو کے لیے
                 document.getElementById('gameOverScreen').classList.add('hidden');
                 gameActive = true;
-                player.y = 600;
-                player.velocityY = 0;
-                player.isJumping = false;
                 activatePowerup('shield');
                 gameLoop();
-                alert('[DEMO] 🚀 کھیل جاری ہے! آپ کو دوسرا موقع ملا!');
+                alert('[DEMO] 🚀 ریس جاری ہے! آپ کو دوسرا موقع ملا!');
             }
         }
 
-        function watchAdForDoubleRewards() {
+        function watchAdForDoubleCoins() {
             if(typeof monetag !== 'undefined') {
                 monetag.showAd('rewarded-interstitial', {
                     onReward: function() {
                         coins *= 2;
-                        score *= 2;
                         updateUI();
-                        alert('🎯 مبارک ہو! آپ کے انعامات دگنے ہو گئے!');
+                        alert('🎯 مبارک ہو! آپ کے سکے دگنے ہو گئے!');
                         restartGame();
                     }
                 });
             } else {
-                // ڈیمو کے لیے
                 coins *= 2;
-                score *= 2;
                 updateUI();
-                alert('[DEMO] 🎯 مبارک ہو! آپ کے انعامات دگنے ہو گئے!');
+                alert('[DEMO] 🎯 مبارک ہو! آپ کے سکے دگنے ہو گئے!');
                 restartGame();
             }
         }
@@ -989,10 +1073,11 @@
 
         // === کی بورڈ کنٹرولز ===
         document.addEventListener('keydown', (e) => {
-            if(e.key === 'ArrowUp' || e.key === ' ') jump();
-            if(e.key === 'ArrowDown') slide();
+            if(e.key === 'ArrowLeft') moveLeft();
+            if(e.key === 'ArrowRight') moveRight();
+            if(e.key === ' ') useBoost();
+            if(e.key === 's') useShield();
             if(e.key === 'p') togglePause();
-            if(e.key === 'r') restartGame();
         });
 
         function togglePause() {
@@ -1006,13 +1091,13 @@
         }
 
         // ہائی اسکور لوڈ کریں
-        if(localStorage.getItem('jungleHighScore')) {
-            highScore = parseInt(localStorage.getItem('jungleHighScore'));
+        if(localStorage.getItem('carHighScore')) {
+            highScore = parseInt(localStorage.getItem('carHighScore'));
             document.getElementById('highScore').textContent = highScore;
         }
 
-        // پہلے سے کوسٹیوم سلیکٹ کریں
-        document.querySelector('.costume-option').click();
+        // ابتدائی UI اپ ڈیٹ
+        updateUpgradeButtons();
     </script>
 
     <!-- Monetag SDK (اپنا Placement ID لگائیں) -->
