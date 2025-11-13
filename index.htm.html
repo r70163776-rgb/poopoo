@@ -3,247 +3,488 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emoji Match Mania</title>
+    <title>Tower Climb Challenge</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 20px;
+            overflow: hidden;
+            height: 100vh;
+            touch-action: manipulation;
         }
-        .game-info {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-            font-size: 1.2em;
-        }
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            max-width: 400px;
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            max-width: 500px;
             margin: 0 auto;
-        }
-        .card {
-            width: 80px;
-            height: 80px;
-            background-color: #fff;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2em;
-            cursor: pointer;
-            transform-style: preserve-3d;
-            transition: transform 0.5s;
-        }
-        .card.flipped {
-            transform: rotateY(180deg);
-        }
-        .card .back {
-            background: #764ba2;
-            color: white;
-        }
-        .controls {
-            margin-top: 20px;
-        }
-        button {
-            background: #FFD700;
-            border: none;
-            padding: 10px 20px;
-            margin: 5px;
+            background: #1a1a2e;
             border-radius: 20px;
-            cursor: pointer;
-            font-size: 1em;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        /* ہیڈر سٹائلز */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .score-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .score-box {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
             font-weight: bold;
         }
-        #ad-container {
-            margin-top: 20px;
-            min-height: 50px;
+
+        /* گیم ایریا */
+        #gameCanvas {
+            background: linear-gradient(180deg, #16213e, #0f3460);
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* کنٹرولز */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .control-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:active {
+            transform: scale(0.9);
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* پاور اپس */
+        .powerups {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .powerup-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            border: none;
+            border-radius: 15px;
+            padding: 10px 15px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255,107,107,0.3);
+            transition: all 0.3s;
+        }
+
+        .powerup-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(255,107,107,0.3);
+        }
+
+        /* مینیو سکرینز */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .screen h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .screen p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102,126,234,0.4);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* ایڈ کنٹینر */
+        #adContainer {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+
+        .ad-btn {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 20px;
+            padding: 12px 25px;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+            box-shadow: 0 5px 15px rgba(255,215,0,0.3);
         }
     </style>
 </head>
 <body>
-    <h1>🎮 Emoji Match Mania</h1>
-    
-    <div class="game-info">
-        <div>Moves: <span id="moves">0</span></div>
-        <div>Time: <span id="timer">0</span>s</div>
-    </div>
+    <div class="game-container">
+        <!-- گیم ہیڈر -->
+        <div class="game-header">
+            <div class="score-container">
+                <div class="score-box">🪙 <span id="coins">0</span></div>
+                <div class="score-box">🏆 <span id="highScore">0</span></div>
+                <div class="score-box">⚡ <span id="level">1</span></div>
+            </div>
+        </div>
 
-    <div class="game-board" id="gameBoard">
-        <!-- Cards will be generated by JavaScript here -->
-    </div>
+        <!-- گیم کینوس -->
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
 
-    <div class="controls">
-        <button onclick="startGame()">نیا کھیل</button>
-        <button onclick="showAdForHints()">اشتہار دیکھ کر ہنٹس پائیں (3)</button>
-        <button onclick="showAdForExtraTime()">اشتہار دیکھ کر اضافی وقت پائیں</button>
-    </div>
+        <!-- پاور اپس -->
+        <div class="powerups">
+            <button class="powerup-btn" onclick="buyShield()">🛡️ شیلڈ (50)</button>
+            <button class="powerup-btn" onclick="buyMagnet()">🧲 میگنٹ (30)</button>
+            <button class="powerup-btn" onclick="buyDoubleCoins()">2× 🪙 (100)</button>
+        </div>
 
-    <div id="ad-container">
-        <!-- Ads will load here -->
+        <!-- کنٹرولز -->
+        <div class="controls">
+            <button class="control-btn" onclick="moveLeft()">←</button>
+            <button class="control-btn" onclick="jump()">↑</button>
+            <button class="control-btn" onclick="moveRight()">→</button>
+        </div>
+
+        <!-- اسٹارٹ اسکرین -->
+        <div id="startScreen" class="screen">
+            <h1>🏰 Tower Climb Challenge</h1>
+            <p>ٹاور چڑھیں، رکاوٹیں پار کریں، اور سکے جمع کریں!</p>
+            <button class="btn" onclick="startGame()">کھیل شروع کریں</button>
+            <button class="btn ad-btn" onclick="watchAdForCoins()">🪙 500 سکے حاصل کریں</button>
+        </div>
+
+        <!-- گیم اوور اسکرین -->
+        <div id="gameOverScreen" class="screen hidden">
+            <h1>گیم ختم!</h1>
+            <p>آپ کا اسکور: <span id="finalScore">0</span></p>
+            <p>زیادہ سے زیادہ اسکور: <span id="finalHighScore">0</span></p>
+            <button class="btn" onclick="restartGame()">دوبارہ کھیلیں</button>
+            <button class="btn ad-btn" onclick="watchAdToContinue()">اشتہار دیکھ کر جاری رکھیں</button>
+        </div>
+
+        <!-- ایڈ کنٹینر -->
+        <div id="adContainer"></div>
     </div>
 
     <script>
-        // === گیم کے متغیرات ===
-        let cards = [];
-        let flippedCards = [];
-        let moves = 0;
-        let timer = 0;
-        let timerInterval;
-        let gameStarted = false;
-        let hints = 0;
+        // === گیم ویری ایبلز ===
+        let gameActive = false;
+        let coins = 0;
+        let highScore = 0;
+        let currentLevel = 1;
+        let player = { x: 200, y: 550, width: 40, height: 60, velocityY: 0, isJumping: false };
+        let platforms = [];
+        let obstacles = [];
+        let coinItems = [];
+        let powerUps = [];
 
-        // ایموجیوں کی فہرست
-        const emojis = ['🐱', '🐶', '🐼', '🐸', '🐯', '🦊', '🐰', '🐨'];
+        // === کینوس سیٹ اپ ===
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
         // === گیم شروع کریں ===
         function startGame() {
-            clearInterval(timerInterval);
-            moves = 0;
-            timer = 0;
-            hints = 0;
-            gameStarted = true;
-            document.getElementById('moves').textContent = moves;
-            document.getElementById('timer').textContent = timer;
-            
-            // کارڈز تیار کریں
+            document.getElementById('startScreen').classList.add('hidden');
+            gameActive = true;
+            coins = 0;
+            currentLevel = 1;
             initializeGame();
+            gameLoop();
             
-            // ٹائمر شروع کریں
-            timerInterval = setInterval(() => {
-                timer++;
-                document.getElementById('timer').textContent = timer;
-            }, 1000);
-
-            // گیم شروع ہونے پر In-App Interstitial چلائیں
+            // گیم شروع ہونے پر In-App Interstitial
             loadInAppInterstitial();
         }
 
-        // === کارڈز تیار کریں ===
         function initializeGame() {
-            const gameBoard = document.getElementById('gameBoard');
-            gameBoard.innerHTML = '';
-            cards = [];
-            flippedCards = [];
-            
-            // دوہرے ایموجی بنائیں
-            let gameEmojis = [...emojis, ...emojis];
-            
-            // ترتیب بے ترتیب کریں
-            gameEmojis.sort(() => Math.random() - 0.5);
-            
-            // کارڈز بنائیں
-            gameEmojis.forEach((emoji, index) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="front">${emoji}</div>
-                    <div class="back">?</div>
-                `;
-                card.addEventListener('click', () => flipCard(card, emoji));
-                gameBoard.appendChild(card);
-                cards.push({ element: card, emoji: emoji, flipped: false });
+            player = { x: 200, y: 550, width: 40, height: 60, velocityY: 0, isJumping: false };
+            platforms = [];
+            obstacles = [];
+            coinItems = [];
+            powerUps = [];
+
+            // پلیٹ فارمز بنائیں
+            for(let i = 0; i < 10; i++) {
+                platforms.push({
+                    x: Math.random() * 350,
+                    y: 500 - (i * 100),
+                    width: 100,
+                    height: 20
+                });
+            }
+
+            // سکے بنائیں
+            for(let i = 0; i < 15; i++) {
+                coinItems.push({
+                    x: Math.random() * 360,
+                    y: Math.random() * 500,
+                    width: 20,
+                    height: 20,
+                    collected: false
+                });
+            }
+
+            updateUI();
+        }
+
+        // === گیم لوپ ===
+        function gameLoop() {
+            if(!gameActive) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // کشش ثقل لاگو کریں
+            player.velocityY += 0.5;
+            player.y += player.velocityY;
+
+            // پلیٹ فارمز سے تصادم
+            platforms.forEach(platform => {
+                ctx.fillStyle = '#4ECDC4';
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+
+                if(player.y + player.height >= platform.y && 
+                   player.y + player.height <= platform.y + 10 &&
+                   player.x + player.width > platform.x && 
+                   player.x < platform.x + platform.width &&
+                   player.velocityY > 0) {
+                    player.y = platform.y - player.height;
+                    player.velocityY = 0;
+                    player.isJumping = false;
+                }
             });
+
+            // سکے ڈرائیں اور جمع کریں
+            coinItems.forEach(coin => {
+                if(!coin.collected) {
+                    ctx.fillStyle = '#FFD700';
+                    ctx.beginPath();
+                    ctx.arc(coin.x + 10, coin.y + 10, 10, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // تصادم کا پتہ لگائیں
+                    if(player.x < coin.x + 20 && player.x + player.width > coin.x &&
+                       player.y < coin.y + 20 && player.y + player.height > coin.y) {
+                        coin.collected = true;
+                        coins += 1;
+                        updateUI();
+                    }
+                }
+            });
+
+            // کھلاڑی ڈرائیں
+            ctx.fillStyle = '#FF6B6B';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // اگر کھلاڑی نیچے گرا تو گیم ختم
+            if(player.y > canvas.height) {
+                endGame();
+                return;
+            }
+
+            // اگلا فریم
+            requestAnimationFrame(gameLoop);
         }
 
-        // === کارڈ پلٹیں ===
-        function flipCard(card, emoji) {
-            if (!gameStarted || flippedCards.length >= 2) return;
-            
-            const cardData = cards.find(c => c.element === card);
-            if (cardData.flipped) return;
-            
-            card.classList.add('flipped');
-            cardData.flipped = true;
-            flippedCards.push(cardData);
-            
-            if (flippedCards.length === 2) {
-                moves++;
-                document.getElementById('moves').textContent = moves;
-                checkForMatch();
+        // === کنٹرولز ===
+        function moveLeft() {
+            if(gameActive && player.x > 0) {
+                player.x -= 20;
             }
         }
 
-        // === میچ چیک کریں ===
-        function checkForMatch() {
-            const [card1, card2] = flippedCards;
+        function moveRight() {
+            if(gameActive && player.x < canvas.width - player.width) {
+                player.x += 20;
+            }
+        }
+
+        function jump() {
+            if(gameActive && !player.isJumping) {
+                player.velocityY = -15;
+                player.isJumping = true;
+            }
+        }
+
+        // === UI اپ ڈیٹ ===
+        function updateUI() {
+            document.getElementById('coins').textContent = coins;
+            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('level').textContent = currentLevel;
+        }
+
+        // === گیم ختم ===
+        function endGame() {
+            gameActive = false;
+            if(coins > highScore) {
+                highScore = coins;
+            }
+            document.getElementById('finalScore').textContent = coins;
+            document.getElementById('finalHighScore').textContent = highScore;
+            document.getElementById('gameOverScreen').classList.remove('hidden');
             
-            if (card1.emoji === card2.emoji) {
-                // میچ مل گیا
-                flippedCards = [];
-                checkGameWin();
+            // گیم ختم ہونے پر In-App Interstitial
+            loadInAppInterstitial();
+        }
+
+        // === گیم دوبارہ شروع ===
+        function restartGame() {
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            startGame();
+        }
+
+        // === پاور اپس ===
+        function buyShield() {
+            if(coins >= 50) {
+                coins -= 50;
+                updateUI();
+                alert('🛡️ آپ کو 30 سیکنڈ کے لیے شیلڈ مل گئی!');
             } else {
-                // میچ نہیں ملا
-                setTimeout(() => {
-                    card1.element.classList.remove('flipped');
-                    card2.element.classList.remove('flipped');
-                    card1.flipped = false;
-                    card2.flipped = false;
-                    flippedCards = [];
-                }, 1000);
+                alert('❌ ناکافی سکے!');
             }
         }
 
-        // === جیت چیک کریں ===
-        function checkGameWin() {
-            const allMatched = cards.every(card => card.flipped);
-            if (allMatched) {
-                clearInterval(timerInterval);
-                setTimeout(() => {
-                    alert(`مبارک ہو! آپ نے یہ گیم ${moves} moves میں ${timer} سیکنڈ میں جیت لی!`);
-                    // کھیل ختم ہونے پر In-App Interstitial چلائیں
-                    loadInAppInterstitial();
-                }, 500);
+        function buyMagnet() {
+            if(coins >= 30) {
+                coins -= 30;
+                updateUI();
+                alert('🧲 آپ کو 20 سیکنڈ کے لیے میگنٹ مل گیا!');
+            } else {
+                alert('❌ ناکافی سکے!');
+            }
+        }
+
+        function buyDoubleCoins() {
+            if(coins >= 100) {
+                coins -= 100;
+                updateUI();
+                alert('2× 🪙 اگلے 2 منٹ کے لیے ڈبل سکے!');
+            } else {
+                alert('❌ ناکافی سکے!');
             }
         }
 
         // === اشتہارات کے افعال ===
 
-        // 1. Rewarded Popup - ہنٹس کے لیے
-        function showAdForHints() {
-            // Monetag Rewarded Popup کو یہاں کال کریں
+        // 1. Rewarded Popup - سکے کے لیے
+        function watchAdForCoins() {
             if(typeof monetag !== 'undefined') {
                 monetag.showAd('rewarded-popup', {
                     onReward: function() {
-                        // انعام: 3 ہنٹس
-                        hints += 3;
-                        alert('مبارک ہو! آپ کو 3 ہنٹس مل گئے ہیں!');
-                        // ہنٹس استعمال کرنے کا فنکشن یہاں آئے گا
+                        coins += 500;
+                        updateUI();
+                        alert('🎉 مبارک ہو! آپ کو 500 سکے مل گئے!');
                     }
                 });
             } else {
                 // ڈیمو کے لیے
-                hints += 3;
-                alert('[DEMO] مبارک ہو! آپ کو 3 ہنٹس مل گئے ہیں!');
+                coins += 500;
+                updateUI();
+                alert('[DEMO] 🎉 مبارک ہو! آپ کو 500 سکے مل گئے!');
             }
         }
 
-        // 2. Rewarded Interstitial - اضافی وقت کے لیے
-        function showAdForExtraTime() {
-            // Monetag Rewarded Interstitial کو یہاں کال کریں
+        // 2. Rewarded Interstitial - گیم جاری رکھنے کے لیے
+        function watchAdToContinue() {
             if(typeof monetag !== 'undefined') {
                 monetag.showAd('rewarded-interstitial', {
                     onReward: function() {
-                        // انعام: 30 سیکنڈ کا اضافی وقت
-                        timer = Math.max(0, timer - 30);
-                        document.getElementById('timer').textContent = timer;
-                        alert('مبارک ہو! آپ کو 30 سیکنڈ کا بونس ملا!');
+                        document.getElementById('gameOverScreen').classList.add('hidden');
+                        gameActive = true;
+                        player.y = 300;
+                        player.velocityY = 0;
+                        gameLoop();
+                        alert('🚀 گیم جاری ہے! آپ کو دوسرا موقع ملا!');
                     }
                 });
             } else {
                 // ڈیمو کے لیے
-                timer = Math.max(0, timer - 30);
-                document.getElementById('timer').textContent = timer;
-                alert('[DEMO] مبارک ہو! آپ کو 30 سیکنڈ کا بونس ملا!');
+                document.getElementById('gameOverScreen').classList.add('hidden');
+                gameActive = true;
+                player.y = 300;
+                player.velocityY = 0;
+                gameLoop();
+                alert('[DEMO] 🚀 گیم جاری ہے! آپ کو دوسرا موقع ملا!');
             }
         }
 
         // 3. In-App Interstitial - مختلف مواقع پر
         function loadInAppInterstitial() {
-            // گیم شروع ہونے یا ختم ہونے پر چلائیں
             if(typeof monetag !== 'undefined') {
                 monetag.showAd('interstitial');
             } else {
@@ -251,8 +492,18 @@
             }
         }
 
-        // پہلی بار گیم شروع کریں
-        startGame();
+        // کی بورڈ کنٹرولز
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowLeft') moveLeft();
+            if(e.key === 'ArrowRight') moveRight();
+            if(e.key === 'ArrowUp' || e.key === ' ') jump();
+        });
+
+        // ہائی اسکور لوڈ کریں
+        if(localStorage.getItem('highScore')) {
+            highScore = parseInt(localStorage.getItem('highScore'));
+            updateUI();
+        }
     </script>
 
     <!-- Monetag SDK (اپنا Placement ID لگائیں) -->
