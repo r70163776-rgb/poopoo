@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><script src='//libtl.com/sdk.js' data-zone='10183375' data-sdk='show_10183375'></script>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>3D Car Racing - Fixed Controls</title>
+    <title>3D Car Racing - Monetized Game</title>
+    
+    <!-- Monetag SDK -->
+    <script src='//libtl.com/sdk.js' data-zone='10183375' data-sdk='show_10183375'></script>
+    
     <style>
         body {
             margin: 0;
@@ -216,8 +220,8 @@
     <div id="game-over">GAME OVER!</div>
 
     <!-- Mobile Control Buttons -->
-    <div id="right-button" class="control-button">◀</div>
-    <div id="left-button" class="control-button">▶</div>
+    <div id="left-button" class="control-button">◀</div>
+    <div id="right-button" class="control-button">▶</div>
     
     <!-- Ad Buttons -->
     <button id="continue-ad-btn" class="ad-button">🎬 Watch Ad to Continue</button>
@@ -334,6 +338,8 @@
             loadingScreen.classList.add('hidden'); 
             setTimeout(() => { 
                 if (loadingScreen) loadingScreen.style.display = 'none'; 
+                // Load initial interstitial ad when game starts
+                loadInAppInterstitial();
             }, 600); 
         };
         
@@ -696,6 +702,9 @@
                             isGameOver = true;
                             gameOverElement.style.display = 'block';
                             continueAdBtn.style.display = 'block';
+                            
+                            // Show interstitial ad when game over
+                            loadInAppInterstitial();
                         }
                     } 
                 }
@@ -705,58 +714,74 @@
             renderer.render(scene, camera);
         }
 
-        // === Ad Integration Functions ===
+        // === Monetag Ad Integration Functions ===
 
         function watchAdToContinue() {
+            // Use Rewarded Interstitial for continue option
             if (typeof monetag !== 'undefined') {
                 monetag.showAd('rewarded-interstitial', {
                     onReward: function() {
                         continueGame();
+                    },
+                    onClose: function() {
+                        console.log("Ad closed");
                     }
                 });
             } else {
-                // Demo mode
+                // Demo mode - fallback
                 continueGame();
             }
         }
 
         function watchAdForDoubleCoins() {
+            // Use Rewarded Popup for double coins
             if (typeof monetag !== 'undefined') {
                 monetag.showAd('rewarded-popup', {
                     onReward: function() {
                         activateDoubleCoins();
+                    },
+                    onClose: function() {
+                        console.log("Ad closed");
                     }
                 });
             } else {
-                // Demo mode
+                // Demo mode - fallback
                 activateDoubleCoins();
             }
         }
 
         function watchAdForShield() {
+            // Use Rewarded Popup for shield
             if (typeof monetag !== 'undefined') {
                 monetag.showAd('rewarded-popup', {
                     onReward: function() {
                         activateShieldPower();
+                    },
+                    onClose: function() {
+                        console.log("Ad closed");
                     }
                 });
             } else {
-                // Demo mode
+                // Demo mode - fallback
                 activateShieldPower();
             }
         }
 
         function watchAdForCoins() {
+            // Use Rewarded Interstitial for coins
             if (typeof monetag !== 'undefined') {
                 monetag.showAd('rewarded-interstitial', {
                     onReward: function() {
                         coins += 500;
                         updateCoinsDisplay();
                         alert('🎉 You received 500 coins!');
+                    },
+                    onClose: function() {
+                        console.log("Ad closed");
                     }
                 });
             } else {
-                // Demo mode
+                // Demo mode - fallback
                 coins += 500;
                 updateCoinsDisplay();
                 alert('[DEMO] 🎉 You received 500 coins!');
@@ -764,8 +789,13 @@
         }
 
         function loadInAppInterstitial() {
+            // Use In-App Interstitial for natural breaks
             if (typeof monetag !== 'undefined') {
-                monetag.showAd('interstitial');
+                monetag.showAd('interstitial', {
+                    onClose: function() {
+                        console.log("Interstitial ad closed");
+                    }
+                });
             } else {
                 console.log('[DEMO] In-App Interstitial would show now');
             }
@@ -846,8 +876,5 @@
         }
 
     </script>
-
-    <!-- Monetag SDK -->
-    <script src='//libtl.com/sdk.js' data-zone='10183375' data-sdk='show_10183375'></script>
 </body>
 </html>
