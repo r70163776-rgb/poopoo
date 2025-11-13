@@ -1,825 +1,261 @@
 <!DOCTYPE html>
-<html lang="en">
-<head><script src="https://fpyf8.com/88/tag.min.js" data-zone="176180" async data-cfasync="false"></script>
+<html lang="ur">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candy Crush - Match 3 Game</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Emoji Match Mania</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-        
-        .game-container {
-            max-width: 500px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            margin-top: 20px;
-        }
-        
-        header {
+            font-family: Arial, sans-serif;
             text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+        .game-info {
+            display: flex;
+            justify-content: space-around;
             margin-bottom: 20px;
+            font-size: 1.2em;
         }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(45deg, #FFD700, #FFA500, #FF6347);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .stats-bar {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        
-        .level-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .level-number {
-            font-size: 1.8rem;
-            color: #FFD700;
-        }
-        
-        .moves-counter, .score-counter {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .moves-count, .score-count {
-            font-size: 1.5rem;
-            color: #4CD964;
-        }
-        
         .game-board {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 5px;
-            margin-bottom: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 10px;
-        }
-        
-        .candy {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
-            user-select: none;
-        }
-        
-        .candy:hover {
-            transform: scale(1.05);
-        }
-        
-        .candy.selected {
-            transform: scale(0.9);
-            box-shadow: 0 0 0 3px white;
-        }
-        
-        .candy.matched {
-            animation: pop 0.5s ease;
-        }
-        
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        
-        .candy-1 { background: linear-gradient(145deg, #FF6B6B, #FF8E53); }
-        .candy-2 { background: linear-gradient(145deg, #4ECDC4, #44A08D); }
-        .candy-3 { background: linear-gradient(145deg, #FFD166, #FF9E64); }
-        .candy-4 { background: linear-gradient(145deg, #06D6A0, #04A777); }
-        .candy-5 { background: linear-gradient(145deg, #118AB2, #0A5F7A); }
-        .candy-6 { background: linear-gradient(145deg, #EF476F, #C1355A); }
-        
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        
-        button {
-            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
-            border: none;
-            padding: 12px 20px;
-            border-radius: 50px;
-            color: white;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .ad-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-            text-align: center;
-        }
-        
-        .ad-label {
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            color: #FFD700;
-        }
-        
-        .ad-link {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin: 5px;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        
-        .ad-link:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-        
-        .screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .reward-popup {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
             max-width: 400px;
-            width: 90%;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin: 0 auto;
         }
-        
-        .reward-title {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            color: #FFD700;
-        }
-        
-        .objective {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
+        .card {
+            width: 80px;
+            height: 80px;
+            background-color: #fff;
             border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
         }
-        
-        .objective h3 {
-            margin-bottom: 10px;
-            color: #FFD700;
+        .card.flipped {
+            transform: rotateY(180deg);
         }
-        
-        .combo-indicator {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 3rem;
+        .card .back {
+            background: #764ba2;
+            color: white;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        button {
+            background: #FFD700;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
             font-weight: bold;
-            color: #FFD700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            z-index: 50;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
         }
-        
-        .combo-show {
-            opacity: 1;
-            animation: comboAnim 1s ease;
-        }
-        
-        @keyframes comboAnim {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-        }
-        
-        @media (max-width: 500px) {
-            .game-board {
-                grid-template-columns: repeat(8, 1fr);
-                gap: 3px;
-            }
-            
-            .candy {
-                font-size: 1.2rem;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            button {
-                padding: 10px 15px;
-                font-size: 0.9rem;
-            }
+        #ad-container {
+            margin-top: 20px;
+            min-height: 50px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>✨ Candy Match ✨</h1>
-        <p>Match 3 or more candies to score points!</p>
-    </header>
+    <h1>🎮 Emoji Match Mania</h1>
     
-    <div class="game-container">
-        <div class="stats-bar">
-            <div class="level-info">
-                <span>LEVEL</span>
-                <div class="level-number">1</div>
-            </div>
-            <div class="moves-counter">
-                <span>MOVES</span>
-                <div class="moves-count">20</div>
-            </div>
-            <div class="score-counter">
-                <span>SCORE</span>
-                <div class="score-count">0</div>
-            </div>
-        </div>
-        
-        <div class="objective">
-            <h3>🎯 Level Objective</h3>
-            <p>Score <strong>1000 points</strong> in <strong>20 moves</strong> to complete the level!</p>
-        </div>
-        
-        <div class="game-board" id="gameBoard">
-            <!-- Candies will be generated here -->
-        </div>
-        
-        <div class="controls">
-            <button onclick="shuffleBoard()">
-                <span>🔀</span> Shuffle
-            </button>
-            <button onclick="showHint()">
-                <span>💡</span> Hint
-            </button>
-            <button onclick="pauseGame()">
-                <span>⏸️</span> Pause
-            </button>
-        </div>     
-        <div class="ad-container">
-            <div class="ad-label">Sponsored Links</div>
-            <a href="https://example.com/game1" class="show_10010275().then(() => {" target="_blank">🎮 Play More Games</a>
-            <a href="https://example.com/game2" class="show_10010275().then(() => {" target="_blank">📱 Download Apps</a>
-            <a href="https://example.com/game3" class="
-
-// Rewarded interstitial
-
-show_10010275().then(() => {
-    // You need to add your user reward function here, which will be executed after the user watches the ad.
-    // For more details, please refer to the detailed instructions.
-    alert('You have seen an ad!');
-})
-
-        k" target="_blank">🛒 Shop Now</a>
-        </div>
-        
-        <button onclick="showRewardedAd()" style="width: 100%; justify-content: center; margin-top: 10px;">
-            <span>🎁</span> Watch Ad for Extra Moves
-        </button>
+    <div class="game-info">
+        <div>Moves: <span id="moves">0</span></div>
+        <div>Time: <span id="timer">0</span>s</div>
     </div>
-    
-    <div class="combo-indicator" id="comboIndicator">COMBO!</div>
-    
-    <!-- Start Screen -->
-    <div id="startScreen" class="screen">
-        <div class="reward-popup">
-            <h1 class="reward-title">✨ Candy Match ✨</h1>
-            <p style="margin-bottom: 20px;">Match colorful candies and create amazing combos!</p>
-            
-            <div class="ad-container">
-                <div class="ad-label">Check out these games:</div>
-                <a href="https://example.com/game4" class="ad-link" target="_blank">🏆 Top Games</a>
-                <a href="https://example.com/game5" class="ad-link" target="_blank">🎯 Puzzle Games</a>
-            </div>
-            
-            <button onclick="startGame()" style="font-size: 1.2rem; padding: 15px 30px; margin-top: 20px;">
-                <span>🎮</span> START GAME
-            </button>
-            
-            <div style="margin-top: 20px;">
-                <p>High Score: <span id="highScore">0</span></p>
-                <p>Total Coins: <span id="totalCoins">0</span></p>
-            </div>
-        </div>
+
+    <div class="game-board" id="gameBoard">
+        <!-- Cards will be generated by JavaScript here -->
     </div>
-    
-    <!-- Game Over Screen -->
-    <div id="gameOverScreen" class="screen hidden">
-        <div class="reward-popup">
-            <h1 class="reward-title" id="gameOverTitle">Level Complete! 🎉</h1>
-            <div style="font-size: 1.5rem; margin-bottom: 10px;">Score: <span id="finalScore">0</span></div>
-            <div style="margin-bottom: 20px;">
-                <div>Moves Left: <span id="movesLeft">0</span></div>
-                <div>Coins Earned: <span id="coinsEarned">0</span></div>
-            </div>
-            
-            <div class="ad-container">
-                <div class="ad-label">You might also like:</div>
-                <a href="https://example.com/game6" class="ad-link" target="_blank">🧩 Match 3 Games</a>
-                <a href="https://example.com/game7" class="ad-link" target="_blank">🏃‍♂️ Action Games</a>
-            </div>
-            
-            <button onclick="nextLevel()" style="margin-top: 15px;">
-                <span>➡️</span> NEXT LEVEL
-            </button>
-            <button onclick="showRewardedAdForCoins()" style="margin-top: 10px;">
-                <span>💰</span> DOUBLE COINS
-            </button>
-            <button onclick="showStartScreen()" style="margin-top: 10px;">
-                <span>🏠</span> MAIN MENU
-            </button>
-        </div>
+
+    <div class="controls">
+        <button onclick="startGame()">نیا کھیل</button>
+        <button onclick="showAdForHints()">اشتہار دیکھ کر ہنٹس پائیں (3)</button>
+        <button onclick="showAdForExtraTime()">اشتہار دیکھ کر اضافی وقت پائیں</button>
     </div>
-    
-    <!-- Pause Screen -->
-    <div id="pauseScreen" class="screen hidden">
-        <div class="reward-popup">
-            <h1 class="reward-title">⏸️ Game Paused</h1>
-            <button onclick="resumeGame()" style="margin-top: 20px;">
-                <span>▶️</span> RESUME
-            </button>
-            <button onclick="restartGame()" style="margin-top: 10px;">
-                <span>🔄</span> RESTART
-            </button>
-            <button onclick="showStartScreen()" style="margin-top: 10px;">
-                <span>🏠</span> MAIN MENU
-            </button>
-        </div>
+
+    <div id="ad-container">
+        <!-- Ads will load here -->
     </div>
 
     <script>
-        // Game state
-        const gameState = {
-            level: 1,
-            moves: 20,
-            score: 0,
-            targetScore: 1000,
-            selectedCandy: null,
-            gameRunning: false,
-            totalCoins: 0,
-            highScore: 0,
-            board: [],
-            boardSize: 8,
-            candyTypes: 6,
-            combos: 0
-        };
+        // === گیم کے متغیرات ===
+        let cards = [];
+        let flippedCards = [];
+        let moves = 0;
+        let timer = 0;
+        let timerInterval;
+        let gameStarted = false;
+        let hints = 0;
 
-        // Initialize Telegram
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
+        // ایموجیوں کی فہرست
+        const emojis = ['🐱', '🐶', '🐼', '🐸', '🐯', '🦊', '🐰', '🐨'];
 
-        // Start game
+        // === گیم شروع کریں ===
         function startGame() {
-            gameState.gameRunning = true;
-            gameState.moves = 20;
-            gameState.score = 0;
-            gameState.selectedCandy = null;
-            gameState.combos = 0;
+            clearInterval(timerInterval);
+            moves = 0;
+            timer = 0;
+            hints = 0;
+            gameStarted = true;
+            document.getElementById('moves').textContent = moves;
+            document.getElementById('timer').textContent = timer;
             
-            document.getElementById('startScreen').classList.add('hidden');
-            createBoard();
-            updateUI();
+            // کارڈز تیار کریں
+            initializeGame();
+            
+            // ٹائمر شروع کریں
+            timerInterval = setInterval(() => {
+                timer++;
+                document.getElementById('timer').textContent = timer;
+            }, 1000);
+
+            // گیم شروع ہونے پر In-App Interstitial چلائیں
+            loadInAppInterstitial();
         }
 
-        // Create game board
-        function createBoard() {
-            const board = document.getElementById('gameBoard');
-            board.innerHTML = '';
-            gameState.board = [];
+        // === کارڈز تیار کریں ===
+        function initializeGame() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+            cards = [];
+            flippedCards = [];
             
-            for (let row = 0; row < gameState.boardSize; row++) {
-                gameState.board[row] = [];
-                for (let col = 0; col < gameState.boardSize; col++) {
-                    const candyType = Math.floor(Math.random() * gameState.candyTypes) + 1;
-                    gameState.board[row][col] = candyType;
-                    
-                    const candy = document.createElement('div');
-                    candy.className = `candy candy-${candyType}`;
-                    candy.dataset.row = row;
-                    candy.dataset.col = col;
-                    candy.innerHTML = getCandyIcon(candyType);
-                    candy.onclick = () => selectCandy(candy, row, col);
-                    
-                    board.appendChild(candy);
-                }
-            }
-        }
-
-        // Get candy icon based on type
-        function getCandyIcon(type) {
-            const icons = ['🍬', '🍭', '🍫', '🍩', '🍪', '🧁'];
-            return icons[type - 1] || '🍬';
-        }
-
-        // Select candy
-        function selectCandy(candy, row, col) {
-            if (!gameState.gameRunning) return;
+            // دوہرے ایموجی بنائیں
+            let gameEmojis = [...emojis, ...emojis];
             
-            // If no candy selected yet
-            if (!gameState.selectedCandy) {
-                gameState.selectedCandy = { element: candy, row, col };
-                candy.classList.add('selected');
-                return;
-            }
+            // ترتیب بے ترتیب کریں
+            gameEmojis.sort(() => Math.random() - 0.5);
             
-            // If same candy clicked again
-            if (gameState.selectedCandy.element === candy) {
-                candy.classList.remove('selected');
-                gameState.selectedCandy = null;
-                return;
-            }
-            
-            // Check if candies are adjacent
-            const selectedRow = gameState.selectedCandy.row;
-            const selectedCol = gameState.selectedCandy.col;
-            
-            const isAdjacent = 
-                (Math.abs(row - selectedRow) === 1 && col === selectedCol) ||
-                (Math.abs(col - selectedCol) === 1 && row === selectedRow);
-            
-            if (isAdjacent) {
-                // Swap candies
-                swapCandies(
-                    gameState.selectedCandy.element, 
-                    selectedRow, selectedCol,
-                    candy, row, col
-                );
-                
-                gameState.selectedCandy.element.classList.remove('selected');
-                gameState.selectedCandy = null;
-                
-                // Check for matches after a short delay
-                setTimeout(checkMatches, 300);
-            } else {
-                // Select new candy
-                gameState.selectedCandy.element.classList.remove('selected');
-                gameState.selectedCandy = { element: candy, row, col };
-                candy.classList.add('selected');
-            }
-        }
-
-        // Swap candies
-        function swapCandies(candy1, row1, col1, candy2, row2, col2) {
-            // Swap in board state
-            const temp = gameState.board[row1][col1];
-            gameState.board[row1][col1] = gameState.board[row2][col2];
-            gameState.board[row2][col2] = temp;
-            
-            // Update UI
-            candy1.innerHTML = getCandyIcon(gameState.board[row1][col1]);
-            candy1.className = `candy candy-${gameState.board[row1][col1]}`;
-            
-            candy2.innerHTML = getCandyIcon(gameState.board[row2][col2]);
-            candy2.className = `candy candy-${gameState.board[row2][col2]}`;
-            
-            // Update moves
-            gameState.moves--;
-            updateUI();
-            
-            // Check if game over
-            if (gameState.moves <= 0) {
-                endGame();
-            }
-        }
-
-        // Check for matches
-        function checkMatches() {
-            let hasMatches = false;
-            
-            // Check horizontal matches
-            for (let row = 0; row < gameState.boardSize; row++) {
-                for (let col = 0; col < gameState.boardSize - 2; col++) {
-                    const candyType = gameState.board[row][col];
-                    if (candyType === gameState.board[row][col+1] && 
-                        candyType === gameState.board[row][col+2]) {
-                        
-                        // Found a match of 3
-                        markMatch(row, col, 1, 0, 3);
-                        hasMatches = true;
-                        
-                        // Check for longer matches
-                        let matchLength = 3;
-                        while (col + matchLength < gameState.boardSize && 
-                               gameState.board[row][col+matchLength] === candyType) {
-                            matchLength++;
-                        }
-                        
-                        if (matchLength > 3) {
-                            markMatch(row, col, 1, 0, matchLength);
-                        }
-                    }
-                }
-            }
-            
-            // Check vertical matches
-            for (let col = 0; col < gameState.boardSize; col++) {
-                for (let row = 0; row < gameState.boardSize - 2; row++) {
-                    const candyType = gameState.board[row][col];
-                    if (candyType === gameState.board[row+1][col] && 
-                        candyType === gameState.board[row+2][col]) {
-                        
-                        // Found a match of 3
-                        markMatch(row, col, 0, 1, 3);
-                        hasMatches = true;
-                        
-                        // Check for longer matches
-                        let matchLength = 3;
-                        while (row + matchLength < gameState.boardSize && 
-                               gameState.board[row+matchLength][col] === candyType) {
-                            matchLength++;
-                        }
-                        
-                        if (matchLength > 3) {
-                            markMatch(row, col, 0, 1, matchLength);
-                        }
-                    }
-                }
-            }
-            
-            if (hasMatches) {
-                // Remove matched candies after animation
-                setTimeout(removeMatches, 500);
-                
-                // Show combo indicator
-                showCombo();
-            }
-        }
-
-        // Mark matched candies
-        function markMatch(startRow, startCol, rowStep, colStep, length) {
-            for (let i = 0; i < length; i++) {
-                const row = startRow + i * rowStep;
-                const col = startCol + i * colStep;
-                
-                const candy = document.querySelector(`.candy[data-row="${row}"][data-col="${col}"]`);
-                if (candy) {
-                    candy.classList.add('matched');
-                }
-            }
-            
-            // Calculate score
-            const baseScore = 100;
-            const lengthBonus = (length - 3) * 50;
-            const comboBonus = gameState.combos * 20;
-            const score = baseScore + lengthBonus + comboBonus;
-            
-            gameState.score += score;
-            gameState.combos++;
-        }
-
-        // Remove matched candies
-        function removeMatches() {
-            const matchedCandies = document.querySelectorAll('.candy.matched');
-            
-            matchedCandies.forEach(candy => {
-                const row = parseInt(candy.dataset.row);
-                const col = parseInt(candy.dataset.col);
-                
-                // Create new candy
-                const candyType = Math.floor(Math.random() * gameState.candyTypes) + 1;
-                gameState.board[row][col] = candyType;
-                
-                // Update candy
-                setTimeout(() => {
-                    candy.innerHTML = getCandyIcon(candyType);
-                    candy.className = `candy candy-${candyType}`;
-                    candy.classList.remove('matched');
-                }, 100);
+            // کارڈز بنائیں
+            gameEmojis.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="front">${emoji}</div>
+                    <div class="back">?</div>
+                `;
+                card.addEventListener('click', () => flipCard(card, emoji));
+                gameBoard.appendChild(card);
+                cards.push({ element: card, emoji: emoji, flipped: false });
             });
-            
-            updateUI();
-            
-            // Check if target score reached
-            if (gameState.score >= gameState.targetScore) {
-                endGame(true);
-            }
-            
-            // Check for new matches after filling the board
-            setTimeout(checkMatches, 500);
         }
 
-        // Show combo indicator
-        function showCombo() {
-            const comboIndicator = document.getElementById('comboIndicator');
+        // === کارڈ پلٹیں ===
+        function flipCard(card, emoji) {
+            if (!gameStarted || flippedCards.length >= 2) return;
             
-            if (gameState.combos > 1) {
-                comboIndicator.textContent = `COMBO x${gameState.combos}!`;
-                comboIndicator.classList.add('combo-show');
-                
-                setTimeout(() => {
-                    comboIndicator.classList.remove('combo-show');
-                }, 1000);
+            const cardData = cards.find(c => c.element === card);
+            if (cardData.flipped) return;
+            
+            card.classList.add('flipped');
+            cardData.flipped = true;
+            flippedCards.push(cardData);
+            
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('moves').textContent = moves;
+                checkForMatch();
             }
         }
 
-        // End game
-        function endGame(isWin = false) {
-            gameState.gameRunning = false;
+        // === میچ چیک کریں ===
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
             
-            const coinsEarned = Math.floor(gameState.score / 10);
-            gameState.totalCoins += coinsEarned;
-            
-            if (gameState.score > gameState.highScore) {
-                gameState.highScore = gameState.score;
-            }
-            
-            document.getElementById('finalScore').textContent = gameState.score;
-            document.getElementById('movesLeft').textContent = gameState.moves;
-            document.getElementById('coinsEarned').textContent = coinsEarned;
-            
-            if (isWin) {
-                document.getElementById('gameOverTitle').textContent = 'Level Complete! 🎉';
+            if (card1.emoji === card2.emoji) {
+                // میچ مل گیا
+                flippedCards = [];
+                checkGameWin();
             } else {
-                document.getElementById('gameOverTitle').textContent = 'Game Over! 😔';
-            }
-            
-            document.getElementById('gameOverScreen').classList.remove('hidden');
-            
-            saveGame();
-        }
-
-        // Next level
-        function nextLevel() {
-            gameState.level++;
-            gameState.targetScore = 1000 + (gameState.level - 1) * 500;
-            document.getElementById('gameOverScreen').classList.add('hidden');
-            startGame();
-        }
-
-        // Shuffle board
-        function shuffleBoard() {
-            if (!gameState.gameRunning) return;
-            
-            createBoard();
-            gameState.moves = Math.max(1, gameState.moves - 3); // Penalty for shuffling
-            updateUI();
-        }
-
-        // Show hint
-        function showHint() {
-            if (!gameState.gameRunning) return;
-            
-            // Simple hint: flash a random candy
-            const candies = document.querySelectorAll('.candy:not(.matched)');
-            if (candies.length > 0) {
-                const randomCandy = candies[Math.floor(Math.random() * candies.length)];
-                randomCandy.style.boxShadow = '0 0 0 3px #FFD700';
-                
+                // میچ نہیں ملا
                 setTimeout(() => {
-                    randomCandy.style.boxShadow = '';
+                    card1.element.classList.remove('flipped');
+                    card2.element.classList.remove('flipped');
+                    card1.flipped = false;
+                    card2.flipped = false;
+                    flippedCards = [];
                 }, 1000);
             }
         }
 
-        // Pause/resume game
-        function pauseGame() {
-            if (!gameState.gameRunning) return;
-            gameState.gameRunning = false;
-            document.getElementById('pauseScreen').classList.remove('hidden');
-        }
-
-        function resumeGame() {
-            gameState.gameRunning = true;
-            document.getElementById('pauseScreen').classList.add('hidden');
-        }
-
-        // Restart game
-        function restartGame() {
-            document.getElementById('pauseScreen').classList.add('hidden');
-            startGame();
-        }
-
-        // Show start screen
-        function showStartScreen() {
-            document.getElementById('startScreen').classList.remove('hidden');
-            document.getElementById('gameOverScreen').classList.add('hidden');
-            document.getElementById('pauseScreen').classList.add('hidden');
-            updateUI();
-        }
-
-        // Update UI
-        function updateUI() {
-            document.getElementById('level').textContent = gameState.level;
-            document.getElementById('movesCount').textContent = gameState.moves;
-            document.getElementById('scoreCount').textContent = gameState.score;
-            document.getElementById('highScore').textContent = gameState.highScore;
-            document.getElementById('totalCoins').textContent = gameState.totalCoins;
-        }
-
-        // Ad functions (simulated)
-        function showRewardedAd() {
-            alert('Ad would play here. After watching, you get 5 extra moves!');
-            gameState.moves += 5;
-            updateUI();
-        }
-
-        function showRewardedAdForCoins() {
-            alert('Ad would play here. After watching, your coins are doubled!');
-            const coinsEarned = Math.floor(gameState.score / 10);
-            gameState.totalCoins += coinsEarned;
-            updateUI();
-            saveGame();
-        }
-
-        // Save/load game
-        function saveGame() {
-            localStorage.setItem('candyCrushSave', JSON.stringify({
-                totalCoins: gameState.totalCoins,
-                highScore: gameState.highScore,
-                level: gameState.level
-            }));
-        }
-
-        function loadGame() {
-            const saved = localStorage.getItem('candyCrushSave');
-            if (saved) {
-                const savedState = JSON.parse(saved);
-                gameState.totalCoins = savedState.totalCoins || 0;
-                gameState.highScore = savedState.highScore || 0;
-                gameState.level = savedState.level || 1;
+        // === جیت چیک کریں ===
+        function checkGameWin() {
+            const allMatched = cards.every(card => card.flipped);
+            if (allMatched) {
+                clearInterval(timerInterval);
+                setTimeout(() => {
+                    alert(`مبارک ہو! آپ نے یہ گیم ${moves} moves میں ${timer} سیکنڈ میں جیت لی!`);
+                    // کھیل ختم ہونے پر In-App Interstitial چلائیں
+                    loadInAppInterstitial();
+                }, 500);
             }
         }
 
-        // Initialize game
-        window.addEventListener('load', () => {
-            loadGame();
-            updateUI();
-            
-            // Telegram Main Button
-            Telegram.WebApp.MainButton.setText('Share Game')
-                .onClick(() => {
-                    Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=https://example.com/candy-match&text=Play%20this%20awesome%20Candy%20Match%20game!');
-                })
-                .show();
-        });
+        // === اشتہارات کے افعال ===
+
+        // 1. Rewarded Popup - ہنٹس کے لیے
+        function showAdForHints() {
+            // Monetag Rewarded Popup کو یہاں کال کریں
+            if(typeof monetag !== 'undefined') {
+                monetag.showAd('rewarded-popup', {
+                    onReward: function() {
+                        // انعام: 3 ہنٹس
+                        hints += 3;
+                        alert('مبارک ہو! آپ کو 3 ہنٹس مل گئے ہیں!');
+                        // ہنٹس استعمال کرنے کا فنکشن یہاں آئے گا
+                    }
+                });
+            } else {
+                // ڈیمو کے لیے
+                hints += 3;
+                alert('[DEMO] مبارک ہو! آپ کو 3 ہنٹس مل گئے ہیں!');
+            }
+        }
+
+        // 2. Rewarded Interstitial - اضافی وقت کے لیے
+        function showAdForExtraTime() {
+            // Monetag Rewarded Interstitial کو یہاں کال کریں
+            if(typeof monetag !== 'undefined') {
+                monetag.showAd('rewarded-interstitial', {
+                    onReward: function() {
+                        // انعام: 30 سیکنڈ کا اضافی وقت
+                        timer = Math.max(0, timer - 30);
+                        document.getElementById('timer').textContent = timer;
+                        alert('مبارک ہو! آپ کو 30 سیکنڈ کا بونس ملا!');
+                    }
+                });
+            } else {
+                // ڈیمو کے لیے
+                timer = Math.max(0, timer - 30);
+                document.getElementById('timer').textContent = timer;
+                alert('[DEMO] مبارک ہو! آپ کو 30 سیکنڈ کا بونس ملا!');
+            }
+        }
+
+        // 3. In-App Interstitial - مختلف مواقع پر
+        function loadInAppInterstitial() {
+            // گیم شروع ہونے یا ختم ہونے پر چلائیں
+            if(typeof monetag !== 'undefined') {
+                monetag.showAd('interstitial');
+            } else {
+                console.log('[DEMO] In-App Interstitial چلایا جاتا');
+            }
+        }
+
+        // پہلی بار گیم شروع کریں
+        startGame();
     </script>
+
+    <!-- Monetag SDK (اپنا Placement ID لگائیں) -->
+    <!-- <script src="https://sdk.monetag.com/?id=YOUR_PLACEMENT_ID"></script> -->
 </body>
 </html>
