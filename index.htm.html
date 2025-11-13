@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Coin Rush - خلائی مہم</title>
+    <title>Jungle Escape - Endless Run</title>
     <style>
         * {
             margin: 0;
@@ -13,249 +13,85 @@
         
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: linear-gradient(135deg, #1a2f1a, #2d5a2d);
             color: white;
             overflow: hidden;
             height: 100vh;
+            touch-action: manipulation;
         }
 
         .game-container {
             position: relative;
             width: 100%;
             height: 100vh;
-            max-width: 480px;
+            max-width: 500px;
             margin: 0 auto;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 20px;
+            background: #0d1f0d;
             overflow: hidden;
-            box-shadow: 0 0 50px rgba(100, 100, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 100, 0, 0.5);
         }
 
-        /* اسٹار بیک گراؤنڈ */
-        .stars {
+        /* گیم کینوس */
+        #gameCanvas {
+            background: linear-gradient(180deg, #87CEEB 0%, #2E8B57 100%);
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* یوآئی اوورلے */
+        .ui-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: transparent;
-        }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-        }
-
-        /* گیم ہیڈر */
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid #00ffff;
+            pointer-events: none;
         }
 
         .stats {
             display: flex;
-            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .stat-box {
-            background: rgba(0, 255, 255, 0.1);
-            padding: 10px 15px;
-            border-radius: 15px;
-            border: 1px solid #00ffff;
-            text-align: center;
-            min-width: 80px;
-        }
-
-        .stat-value {
-            font-size: 1.2em;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #8B4513;
             font-weight: bold;
-            color: #00ffff;
+            font-size: 1.1em;
+            backdrop-filter: blur(10px);
         }
-
-        /* گیم ایریا */
-        #gameArea {
-            position: relative;
-            width: 100%;
-            height: calc(100vh - 120px);
-            overflow: hidden;
-            background: linear-gradient(180deg, #000428, #004e92);
-        }
-
-        /* سپیس شپ */
-        #player {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 10 L70 50 L50 90 L30 50 Z" fill="%2300ffff"/><circle cx="50" cy="50" r="20" fill="%230055ff"/></svg>');
-            background-size: contain;
-            transition: transform 0.1s;
-            z-index: 10;
-        }
-
-        /* سکے */
-        .coin {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle at 30% 30%, #ffd700, #ff6b00);
-            border-radius: 50%;
-            animation: rotate 2s linear infinite;
-            box-shadow: 0 0 15px #ffd700;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* رکاوٹیں */
-        .obstacle {
-            position: absolute;
-            background: linear-gradient(45deg, #ff416c, #ff4b2b);
-            border-radius: 10px;
-            box-shadow: 0 0 10px #ff416c;
-        }
-
-        /* پاور اپس */
-        .powerup {
-            position: absolute;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .shield { background: radial-gradient(circle at 30% 30%, #00ff88, #00a86b); }
-        .magnet { background: radial-gradient(circle at 30% 30%, #ff4444, #cc0000); }
-        .slowmo { background: radial-gradient(circle at 30% 30%, #8844ff, #5500cc); }
 
         /* کنٹرولز */
         .controls {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             left: 0;
             right: 0;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 50px;
         }
 
-        .joystick {
-            width: 120px;
-            height: 120px;
-            background: rgba(255, 255, 255, 0.1);
+        .control-btn {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border: 2px solid #00ffff;
-            position: relative;
-            touch-action: none;
-        }
-
-        .joystick-handle {
-            width: 50px;
-            height: 50px;
-            background: #00ffff;
-            border-radius: 50%;
-            position: absolute;
-            top: 35px;
-            left: 35px;
-            box-shadow: 0 0 20px #00ffff;
-        }
-
-        /* ایکشن بٹنز */
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .action-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
-            border: none;
+            background: rgba(139, 69, 19, 0.8);
+            border: 3px solid #654321;
             color: white;
-            font-size: 1.5em;
+            font-size: 2em;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
-            transition: all 0.2s;
+            pointer-events: auto;
+            transition: all 0.1s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
         }
 
-        .action-btn:active {
+        .control-btn:active {
             transform: scale(0.9);
-        }
-
-        /* مینیو سکرینز */
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-            text-align: center;
-        }
-
-        .screen h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            background: linear-gradient(45deg, #00ffff, #0088ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px #00ffff;
-        }
-
-        .screen p {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-            max-width: 80%;
-            line-height: 1.6;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #00ffff, #0088ff);
-            border: none;
-            border-radius: 25px;
-            padding: 15px 30px;
-            color: #000;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s;
-            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(0, 255, 255, 0.4);
-        }
-
-        .ad-btn {
-            background: linear-gradient(45deg, #ffd700, #ffa500);
-            color: #000;
-            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
-        }
-
-        .hidden {
-            display: none;
+            background: rgba(160, 82, 45, 0.9);
         }
 
         /* پاور اپ بار */
@@ -272,141 +108,232 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            border: 2px solid white;
+            border: 2px solid #ffd700;
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2em;
+            font-size: 1.5em;
             opacity: 0.3;
             transition: all 0.3s;
         }
 
         .powerup-indicator.active {
             opacity: 1;
-            box-shadow: 0 0 20px currentColor;
+            box-shadow: 0 0 20px #ffd700;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* مینیو سکرینز */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(13, 31, 13, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            text-align: center;
+        }
+
+        .screen h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #32CD32;
+            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; }
+            to { text-shadow: 0 0 15px #00ff00, 0 0 30px #00ff00, 0 0 40px #00ff00; }
+        }
+
+        .screen p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            max-width: 80%;
+            line-height: 1.6;
+            color: #98FB98;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #228B22, #32CD32);
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(34, 139, 34, 0.3);
+            pointer-events: auto;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(34, 139, 34, 0.4);
+        }
+
+        .ad-btn {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .hidden {
+            display: none;
         }
 
         /* پارٹیکل ایفیکٹس */
         .particle {
             position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #00ffff;
-            border-radius: 50%;
             pointer-events: none;
+            border-radius: 50%;
+        }
+
+        /* درخت اور پودے */
+        .tree, .bush {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        /* کوسٹیوم سلیکشن */
+        .costume-selection {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .costume-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            transition: all 0.3s;
+        }
+
+        .costume-option.selected {
+            border-color: #32CD32;
+            box-shadow: 0 0 15px #32CD32;
+            transform: scale(1.1);
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <!-- اسٹار بیک گراؤنڈ -->
-        <div class="stars" id="stars"></div>
+        <!-- گیم کینوس -->
+        <canvas id="gameCanvas" width="500" height="800"></canvas>
 
-        <!-- گیم ہیڈر -->
-        <div class="game-header">
+        <!-- یوآئی اوورلے -->
+        <div class="ui-overlay">
             <div class="stats">
-                <div class="stat-box">
-                    <div>🪙 سکے</div>
-                    <div class="stat-value" id="coins">0</div>
-                </div>
-                <div class="stat-box">
-                    <div>🎯 اسکور</div>
-                    <div class="stat-value" id="score">0</div>
-                </div>
-                <div class="stat-box">
-                    <div>🚀 لیول</div>
-                    <div class="stat-value" id="level">1</div>
-                </div>
+                <div class="stat-box">🪙 سکے: <span id="coins">0</span></div>
+                <div class="stat-box">📊 اسکور: <span id="score">0</span></div>
+                <div class="stat-box">🔥 ہائی اسکور: <span id="highScore">0</span></div>
             </div>
-        </div>
-
-        <!-- گیم ایریا -->
-        <div id="gameArea">
-            <div id="player"></div>
-            <!-- سکے، رکاوٹیں اور پاور اپس یہاں جنریٹ ہوں گے -->
         </div>
 
         <!-- پاور اپ بار -->
         <div class="powerup-bar">
             <div class="powerup-indicator" id="shieldIndicator">🛡️</div>
+            <div class="powerup-indicator" id="speedIndicator">⚡</div>
             <div class="powerup-indicator" id="magnetIndicator">🧲</div>
-            <div class="powerup-indicator" id="slowmoIndicator">⏳</div>
+            <div class="powerup-indicator" id="doubleIndicator">2×</div>
         </div>
 
         <!-- کنٹرولز -->
         <div class="controls">
-            <div class="joystick" id="joystick">
-                <div class="joystick-handle"></div>
-            </div>
-            <div class="action-buttons">
-                <button class="action-btn" onclick="activateShield()">🛡️</button>
-                <button class="action-btn" onclick="activateMagnet()">🧲</button>
-            </div>
+            <button class="control-btn" onclick="jump()">↑</button>
+            <button class="control-btn" onclick="slide()">↓</button>
+            <button class="control-btn" onclick="usePowerup()">💥</button>
         </div>
 
         <!-- اسٹارٹ اسکرین -->
         <div id="startScreen" class="screen">
-            <h1>🌌 Space Coin Rush</h1>
-            <p>خلائی جہاز چلائیں، سکے جمع کریں، اور رکاوٹوں سے بچیں!</p>
-            <p>🚀 <strong>خصوصی پاور اپس:</strong><br>
-            🛡️ شیلڈ - رکاوٹوں سے تحفظ<br>
-            🧲 میگنٹ - سکے اپنی طرف کھینچے<br>
-            ⏳ سلو مو - وقت سست کریں</p>
-            <button class="btn" onclick="startGame()">مہم شروع کریں</button>
-            <button class="btn ad-btn" onclick="watchAdForStartingCoins()">🪙 1000 سکے حاصل کریں</button>
+            <h1>🌴 Jungle Escape</h1>
+            <p>خطرناک جنگل سے بھاگو، رکاوٹیں پار کرو، اور قیمتی خزانے جمع کرو!</p>
+            
+            <div class="costume-selection">
+                <div class="costume-option selected" onclick="selectCostume('explorer')">🧑‍🌾</div>
+                <div class="costume-option" onclick="selectCostume('adventurer')">🧑‍🚀</div>
+                <div class="costume-option" onclick="selectCostume('ninja')">🥷</div>
+                <div class="costume-option" onclick="selectCostume('athlete')">🏃‍♂️</div>
+            </div>
+
+            <button class="btn" onclick="startGame()">بھاگو!</button>
+            <button class="btn ad-btn" onclick="watchAdForStartingBonus()">🎁 500 سکے + شیلڈ حاصل کریں</button>
+        </div>
+
+        <!-- پاز اسکرین -->
+        <div id="pauseScreen" class="screen hidden">
+            <h1>⏸️ روکا گیا</h1>
+            <p>کھیل روکا گیا ہے</p>
+            <button class="btn" onclick="resumeGame()">جاری رکھیں</button>
+            <button class="btn" onclick="restartGame()">دوبارہ شروع کریں</button>
         </div>
 
         <!-- گیم اوور اسکرین -->
         <div id="gameOverScreen" class="screen hidden">
-            <h1>مہم ختم!</h1>
+            <h1>💀 جنگل نے پکڑ لیا!</h1>
             <p>آپ کا اسکور: <span id="finalScore">0</span></p>
             <p>جمع کردہ سکے: <span id="finalCoins">0</span></p>
             <p>زیادہ سے زیادہ اسکور: <span id="finalHighScore">0</span></p>
-            <button class="btn" onclick="restartGame()">دوبارہ کھیلیں</button>
-            <button class="btn ad-btn" onclick="watchAdToContinue()">اشتہار دیکھ کر جاری رکھیں</button>
-            <button class="btn ad-btn" onclick="watchAdForDoubleCoins()">اشتہار دیکھ کر سکے دگنے کریں</button>
-        </div>
-
-        <!-- شاپ اسکرین -->
-        <div id="shopScreen" class="screen hidden">
-            <h1>🛍️ خلائی شاپ</h1>
-            <p>آپ کے سکے: <span id="shopCoins">0</span></p>
-            <div class="shop-items">
-                <button class="btn" onclick="buyUpgrade('speed')">🚀 سپیڈ اپ (200 سکے)</button>
-                <button class="btn" onclick="buyUpgrade('magnet')">🧲 میگنٹ اپ (300 سکے)</button>
-                <button class="btn" onclick="buyUpgrade('shield')">🛡️ شیلڈ اپ (400 سکے)</button>
-            </div>
-            <button class="btn" onclick="closeShop()">واپس جائیں</button>
+            
+            <button class="btn" onclick="restartGame()">دوبارہ کوشش کریں</button>
+            <button class="btn ad-btn" onclick="watchAdToContinue()">🎬 اشتہار دیکھ کر جاری رکھیں</button>
+            <button class="btn ad-btn" onclick="watchAdForDoubleRewards()">💰 اشتہار دیکھ کر انعام دگنا کریں</button>
         </div>
     </div>
 
     <script>
         // === گیم ویری ایبلز ===
         let gameActive = false;
+        let gamePaused = false;
         let coins = 0;
         let score = 0;
         let highScore = 0;
-        let currentLevel = 1;
-        let playerX = 200;
-        let playerY = 300;
-        let gameSpeed = 3;
+        let gameSpeed = 5;
+        let player = { x: 100, y: 600, width: 50, height: 80, velocityY: 0, isJumping: false, isSliding: false };
+        let obstacles = [];
+        let coinsArray = [];
+        let powerups = [];
         let activePowerups = {};
-        let stars = [];
+        let backgroundElements = [];
+        let selectedCostume = 'explorer';
+
+        // === کینوس سیٹ اپ ===
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
         // === گیم شروع کریں ===
         function startGame() {
             document.getElementById('startScreen').classList.add('hidden');
             gameActive = true;
+            gamePaused = false;
             coins = 0;
             score = 0;
-            currentLevel = 1;
-            playerX = 200;
-            playerY = 300;
-            gameSpeed = 3;
-            activePowerups = {};
+            gameSpeed = 5;
             
-            updateUI();
-            createStars();
+            initializeGame();
             gameLoop();
             startSpawning();
             
@@ -414,136 +341,434 @@
             loadInAppInterstitial();
         }
 
-        // === اسٹارز بنائیں ===
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            starsContainer.innerHTML = '';
-            stars = [];
+        function initializeGame() {
+            player = { 
+                x: 100, 
+                y: 600, 
+                width: 50, 
+                height: 80, 
+                velocityY: 0, 
+                isJumping: false, 
+                isSliding: false,
+                normalHeight: 80,
+                slideHeight: 40
+            };
             
-            for(let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                const size = Math.random() * 2 + 1;
-                star.style.width = size + 'px';
-                star.style.height = size + 'px';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite`;
-                starsContainer.appendChild(star);
-                
-                stars.push({
-                    element: star,
-                    speed: Math.random() * 2 + 1
+            obstacles = [];
+            coinsArray = [];
+            powerups = [];
+            activePowerups = {};
+            backgroundElements = [];
+            
+            createBackground();
+            updateUI();
+        }
+
+        // === بیک گراؤنڈ بنائیں ===
+        function createBackground() {
+            // درخت بنائیں
+            for(let i = 0; i < 10; i++) {
+                backgroundElements.push({
+                    type: 'tree',
+                    x: Math.random() * canvas.width,
+                    y: canvas.height - 150,
+                    width: 60,
+                    height: 150,
+                    speed: gameSpeed * 0.3
+                });
+            }
+            
+            // پودے بنائیں
+            for(let i = 0; i < 20; i++) {
+                backgroundElements.push({
+                    type: 'bush',
+                    x: Math.random() * canvas.width,
+                    y: canvas.height - 50,
+                    width: 40,
+                    height: 40,
+                    speed: gameSpeed * 0.5
                 });
             }
         }
 
         // === گیم لوپ ===
         function gameLoop() {
-            if(!gameActive) return;
+            if(!gameActive || gamePaused) return;
 
-            // اسٹارز کو حرکت دیں (خلائی جہاز کی حرکت کا احساس)
-            stars.forEach(star => {
-                const currentTop = parseFloat(star.element.style.top);
-                star.element.style.top = (currentTop + star.speed) + '%';
-                if(currentTop > 100) {
-                    star.element.style.top = '-10px';
-                    star.element.style.left = Math.random() * 100 + '%';
-                }
-            });
-
-            // سپانس شدہ آئٹمز کو حرکت دیں
-            moveSpawnedItems();
-
-            // پاور اپس کی ڈیوریشن چیک کریں
-            checkPowerupDuration();
-
-            // سپیڈ بڑھائیں (لیول کے مطابق)
-            if(score > currentLevel * 1000) {
-                currentLevel++;
-                gameSpeed += 0.5;
-                document.getElementById('level').textContent = currentLevel;
-                createParticles(playerX, playerY, 20, '#00ffff');
-            }
-
+            // کینوس صاف کریں
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // بیک گراؤنڈ ڈرائیں
+            drawBackground();
+            
+            // کشش ثقل لاگو کریں
+            applyGravity();
+            
+            // تمام آئٹمز کو حرکت دیں
+            moveGameElements();
+            
+            // تصادم کا پتہ لگائیں
+            checkCollisions();
+            
+            // اسکور اور سپیڈ بڑھائیں
+            updateGameStats();
+            
+            // کھلاڑی اور آئٹمز ڈرائیں
+            drawPlayer();
+            drawObstacles();
+            drawCoins();
+            drawPowerups();
+            
             // اگلا فریم
             requestAnimationFrame(gameLoop);
         }
 
-        // === آئٹمز کو حرکت دیں ===
-        function moveSpawnedItems() {
-            // تمام آئٹمز کو اوپر سے نیچے حرکت دیں
-            const items = document.querySelectorAll('.coin, .obstacle, .powerup');
-            items.forEach(item => {
-                const currentTop = parseFloat(item.style.top);
-                item.style.top = (currentTop + gameSpeed) + 'px';
-                
-                // اگر آئٹم اسکرین سے باہر چلا جائے تو ہٹا دیں
-                if(currentTop > 600) {
-                    item.remove();
+        // === بیک گراؤنڈ ڈرائیں ===
+        function drawBackground() {
+            // آسمان
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // زمین
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, canvas.height - 100, canvas.width, 100);
+            
+            ctx.fillStyle = '#2E8B57';
+            ctx.fillRect(0, canvas.height - 100, canvas.width, 20);
+            
+            // بیک گراؤنڈ ایلیمنٹس
+            backgroundElements.forEach(element => {
+                if(element.type === 'tree') {
+                    ctx.fillStyle = '#8B4513';
+                    ctx.fillRect(element.x, element.y, 20, element.height);
+                    ctx.fillStyle = '#228B22';
+                    ctx.beginPath();
+                    ctx.arc(element.x + 10, element.y, 40, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if(element.type === 'bush') {
+                    ctx.fillStyle = '#32CD32';
+                    ctx.beginPath();
+                    ctx.arc(element.x + 20, element.y + 20, 20, 0, Math.PI * 2);
+                    ctx.fill();
                 }
                 
-                // تصادم کا پتہ لگائیں
-                checkCollision(item);
+                // حرکت دیں
+                element.x -= element.speed;
+                if(element.x < -100) {
+                    element.x = canvas.width + Math.random() * 100;
+                }
             });
         }
 
-        // === تصادم کا پتہ لگائیں ===
-        function checkCollision(item) {
-            const rect1 = {x: playerX, y: playerY, width: 60, height: 60};
-            const rect2 = {
-                x: parseFloat(item.style.left),
-                y: parseFloat(item.style.top),
-                width: parseInt(item.style.width),
-                height: parseInt(item.style.height)
-            };
-
-            if(rect1.x < rect2.x + rect2.width &&
-               rect1.x + rect1.width > rect2.x &&
-               rect1.y < rect2.y + rect2.height &&
-               rect1.y + rect1.height > rect2.y) {
-               
-                if(item.classList.contains('coin')) {
-                    // سکہ جمع کریں
-                    collectCoin(item);
-                }
-                else if(item.classList.contains('obstacle')) {
-                    // رکاوٹ سے تصادم
-                    if(!activePowerups.shield) {
-                        endGame();
-                    } else {
-                        item.remove();
-                        createParticles(rect2.x, rect2.y, 15, '#ff4444');
-                    }
-                }
-                else if(item.classList.contains('powerup')) {
-                    // پاور اپ جمع کریں
-                    collectPowerup(item);
+        // === کشش ثقل لاگو کریں ===
+        function applyGravity() {
+            if(player.isJumping) {
+                player.velocityY += 0.8;
+                player.y += player.velocityY;
+                
+                if(player.y >= 600) {
+                    player.y = 600;
+                    player.velocityY = 0;
+                    player.isJumping = false;
+                    player.isSliding = false;
+                    player.height = player.normalHeight;
                 }
             }
         }
 
-        // === سکہ جمع کریں ===
-        function collectCoin(coin) {
-            coin.remove();
-            const coinValue = activePowerups.doubleCoins ? 2 : 1;
-            coins += coinValue;
-            score += 10 * coinValue;
+        // === گیم ایلیمنٹس کو حرکت دیں ===
+        function moveGameElements() {
+            // رکاوٹیں حرکت دیں
+            obstacles.forEach((obstacle, index) => {
+                obstacle.x -= gameSpeed;
+                if(obstacle.x < -100) {
+                    obstacles.splice(index, 1);
+                }
+            });
             
-            createParticles(
-                parseFloat(coin.style.left) + 15,
-                parseFloat(coin.style.top) + 15,
-                8, '#ffd700'
-            );
+            // سکے حرکت دیں
+            coinsArray.forEach((coin, index) => {
+                coin.x -= gameSpeed;
+                if(coin.x < -50) {
+                    coinsArray.splice(index, 1);
+                }
+            });
+            
+            // پاور اپس حرکت دیں
+            powerups.forEach((powerup, index) => {
+                powerup.x -= gameSpeed;
+                if(powerup.x < -50) {
+                    powerups.splice(index, 1);
+                }
+            });
+        }
+
+        // === تصادم کا پتہ لگائیں ===
+        function checkCollisions() {
+            // رکاوٹوں سے تصادم
+            obstacles.forEach(obstacle => {
+                if(isColliding(player, obstacle)) {
+                    if(!activePowerups.shield) {
+                        endGame();
+                    } else {
+                        // شیلڈ ہونے پر رکاوٹ کو ہٹا دیں
+                        obstacles = obstacles.filter(obs => obs !== obstacle);
+                        createParticles(obstacle.x + 25, obstacle.y + 25, 15, '#ff4444');
+                    }
+                }
+            });
+            
+            // سکے جمع کریں
+            coinsArray.forEach((coin, index) => {
+                if(isColliding(player, coin)) {
+                    const coinValue = activePowerups.doubleCoins ? 2 : 1;
+                    coins += coinValue;
+                    score += 10 * coinValue;
+                    coinsArray.splice(index, 1);
+                    createParticles(coin.x + 15, coin.y + 15, 8, '#ffd700');
+                    updateUI();
+                }
+            });
+            
+            // پاور اپس جمع کریں
+            powerups.forEach((powerup, index) => {
+                if(isColliding(player, powerup)) {
+                    activatePowerup(powerup.type);
+                    powerups.splice(index, 1);
+                    createParticles(powerup.x + 20, powerup.y + 20, 12, getPowerupColor(powerup.type));
+                }
+            });
+        }
+
+        // === تصادم چیک ===
+        function isColliding(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        // === گیم اسٹیٹس اپ ڈیٹ ===
+        function updateGameStats() {
+            score += Math.floor(gameSpeed / 2);
+            
+            // ہر 1000 اسکور پر سپیڈ بڑھائیں
+            if(score % 1000 === 0 && gameSpeed < 15) {
+                gameSpeed += 0.5;
+            }
             
             updateUI();
         }
 
-        // === پاور اپ جمع کریں ===
-        function collectPowerup(powerup) {
-            const type = powerup.classList[1];
-            powerup.remove();
+        // === کھلاڑی ڈرائیں ===
+        function drawPlayer() {
+            ctx.fillStyle = getCostumeColor();
             
+            if(player.isSliding) {
+                // سلائیڈنگ پوزیشن
+                ctx.fillRect(player.x, player.y + 40, player.width, player.slideHeight);
+            } else {
+                // عام پوزیشن
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+                
+                // کھلاڑی کی شکل بنائیں
+                ctx.fillStyle = '#000';
+                ctx.fillRect(player.x + 10, player.y + 15, 10, 10); // بائیں آنکھ
+                ctx.fillRect(player.x + 30, player.y + 15, 10, 10); // دائیں آنکھ
+                ctx.fillRect(player.x + 15, player.y + 35, 20, 5); // منہ
+            }
+            
+            // ایکٹو پاور اپس کے ایفیکٹس
+            if(activePowerups.shield) {
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(player.x + 25, player.y + 40, 45, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        // === رکاوٹیں ڈرائیں ===
+        function drawObstacles() {
+            obstacles.forEach(obstacle => {
+                ctx.fillStyle = obstacle.color;
+                
+                if(obstacle.type === 'rock') {
+                    ctx.beginPath();
+                    ctx.arc(obstacle.x + 25, obstacle.y + 25, 25, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if(obstacle.type === 'tree') {
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                } else if(obstacle.type === 'pit') {
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                }
+            });
+        }
+
+        // === سکے ڈرائیں ===
+        function drawCoins() {
+            coinsArray.forEach(coin => {
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath();
+                ctx.arc(coin.x + 15, coin.y + 15, 15, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ff6b00';
+                ctx.beginPath();
+                ctx.arc(coin.x + 15, coin.y + 15, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText('$', coin.x + 10, coin.y + 20);
+            });
+        }
+
+        // === پاور اپس ڈرائیں ===
+        function drawPowerups() {
+            powerups.forEach(powerup => {
+                ctx.fillStyle = getPowerupColor(powerup.type);
+                ctx.fillRect(powerup.x, powerup.y, powerup.width, powerup.height);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 20px Arial';
+                
+                let symbol = '';
+                switch(powerup.type) {
+                    case 'shield': symbol = '🛡️'; break;
+                    case 'speed': symbol = '⚡'; break;
+                    case 'magnet': symbol = '🧲'; break;
+                    case 'double': symbol = '2×'; break;
+                }
+                
+                ctx.fillText(symbol, powerup.x + 10, powerup.y + 25);
+            });
+        }
+
+        // === سپانس سسٹم ===
+        function startSpawning() {
+            // رکاوٹیں سپانس کریں
+            setInterval(() => {
+                if(gameActive && !gamePaused) {
+                    spawnObstacle();
+                }
+            }, 1500);
+            
+            // سکے سپانس کریں
+            setInterval(() => {
+                if(gameActive && !gamePaused) {
+                    spawnCoin();
+                }
+            }, 800);
+            
+            // پاور اپس سپانس کریں
+            setInterval(() => {
+                if(gameActive && !gamePaused && Math.random() < 0.3) {
+                    spawnPowerup();
+                }
+            }, 5000);
+        }
+
+        function spawnObstacle() {
+            const types = ['rock', 'tree', 'pit'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            let obstacle;
+            switch(type) {
+                case 'rock':
+                    obstacle = {
+                        type: 'rock',
+                        x: canvas.width,
+                        y: canvas.height - 100,
+                        width: 50,
+                        height: 50,
+                        color: '#696969'
+                    };
+                    break;
+                case 'tree':
+                    obstacle = {
+                        type: 'tree',
+                        x: canvas.width,
+                        y: canvas.height - 150,
+                        width: 30,
+                        height: 100,
+                        color: '#8B4513'
+                    };
+                    break;
+                case 'pit':
+                    obstacle = {
+                        type: 'pit',
+                        x: canvas.width,
+                        y: canvas.height - 50,
+                        width: 80,
+                        height: 50,
+                        color: '#000000'
+                    };
+                    break;
+            }
+            
+            obstacles.push(obstacle);
+        }
+
+        function spawnCoin() {
+            coinsArray.push({
+                x: canvas.width,
+                y: Math.random() * 400 + 200,
+                width: 30,
+                height: 30
+            });
+        }
+
+        function spawnPowerup() {
+            const types = ['shield', 'speed', 'magnet', 'double'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            powerups.push({
+                type: type,
+                x: canvas.width,
+                y: Math.random() * 400 + 200,
+                width: 40,
+                height: 40
+            });
+        }
+
+        // === کنٹرولز ===
+        function jump() {
+            if(gameActive && !gamePaused && !player.isJumping) {
+                player.velocityY = -20;
+                player.isJumping = true;
+                player.isSliding = false;
+                player.height = player.normalHeight;
+            }
+        }
+
+        function slide() {
+            if(gameActive && !gamePaused && !player.isJumping) {
+                player.isSliding = true;
+                player.height = player.slideHeight;
+                
+                setTimeout(() => {
+                    if(player.isSliding && !player.isJumping) {
+                        player.isSliding = false;
+                        player.height = player.normalHeight;
+                    }
+                }, 1000);
+            }
+        }
+
+        function usePowerup() {
+            if(gameActive && !gamePaused) {
+                // سپیشل پاور اپ ایکٹیویٹ کریں
+                if(coins >= 100) {
+                    coins -= 100;
+                    activatePowerup('super');
+                    updateUI();
+                }
+            }
+        }
+
+        // === پاور اپ ایکٹیویٹ ===
+        function activatePowerup(type) {
             activePowerups[type] = {
                 active: true,
                 startTime: Date.now(),
@@ -553,71 +778,35 @@
             // انڈیکیٹر ایکٹیو کریں
             document.getElementById(type + 'Indicator').classList.add('active');
             
-            createParticles(
-                parseFloat(powerup.style.left) + 17,
-                parseFloat(powerup.style.top) + 17,
-                12, getPowerupColor(type)
-            );
-        }
-
-        // === پاور اپ کی ڈیوریشن چیک کریں ===
-        function checkPowerupDuration() {
-            const now = Date.now();
-            Object.keys(activePowerups).forEach(type => {
-                if(now - activePowerups[type].startTime > activePowerups[type].duration) {
+            // ایفیکٹس لاگو کریں
+            switch(type) {
+                case 'shield':
+                    break;
+                case 'speed':
+                    gameSpeed += 3;
+                    break;
+                case 'magnet':
+                    break;
+                case 'double':
+                    break;
+                case 'super':
+                    // سپیشل ایفیکٹ
+                    gameSpeed += 5;
+                    coins += 50;
+                    break;
+            }
+            
+            // ڈیوریشن کے بعد ختم کریں
+            setTimeout(() => {
+                if(activePowerups[type]) {
                     activePowerups[type].active = false;
                     document.getElementById(type + 'Indicator').classList.remove('active');
+                    
+                    if(type === 'speed') {
+                        gameSpeed -= 3;
+                    }
                 }
-            });
-        }
-
-        // === سپانس سسٹم ===
-        function startSpawning() {
-            // سکے سپانس کریں
-            setInterval(() => {
-                if(gameActive) spawnCoin();
-            }, 1000);
-
-            // رکاوٹیں سپانس کریں
-            setInterval(() => {
-                if(gameActive) spawnObstacle();
-            }, 2000);
-
-            // پاور اپس سپانس کریں
-            setInterval(() => {
-                if(gameActive && Math.random() < 0.3) spawnPowerup();
-            }, 5000);
-        }
-
-        function spawnCoin() {
-            const coin = document.createElement('div');
-            coin.className = 'coin';
-            coin.style.left = Math.random() * 400 + 'px';
-            coin.style.top = '-30px';
-            document.getElementById('gameArea').appendChild(coin);
-        }
-
-        function spawnObstacle() {
-            const obstacle = document.createElement('div');
-            obstacle.className = 'obstacle';
-            const width = Math.random() * 80 + 40;
-            const height = Math.random() * 80 + 40;
-            obstacle.style.width = width + 'px';
-            obstacle.style.height = height + 'px';
-            obstacle.style.left = Math.random() * (480 - width) + 'px';
-            obstacle.style.top = '-100px';
-            document.getElementById('gameArea').appendChild(obstacle);
-        }
-
-        function spawnPowerup() {
-            const powerups = ['shield', 'magnet', 'slowmo'];
-            const type = powerups[Math.floor(Math.random() * powerups.length)];
-            
-            const powerup = document.createElement('div');
-            powerup.className = `powerup ${type}`;
-            powerup.style.left = Math.random() * 400 + 'px';
-            powerup.style.top = '-40px';
-            document.getElementById('gameArea').appendChild(powerup);
+            }, 10000);
         }
 
         // === پارٹیکل ایفیکٹس ===
@@ -627,14 +816,16 @@
                 particle.className = 'particle';
                 particle.style.left = x + 'px';
                 particle.style.top = y + 'px';
+                particle.style.width = '8px';
+                particle.style.height = '8px';
                 particle.style.background = color;
+                
+                document.querySelector('.game-container').appendChild(particle);
                 
                 const angle = Math.random() * Math.PI * 2;
                 const speed = Math.random() * 5 + 2;
                 const vx = Math.cos(angle) * speed;
                 const vy = Math.sin(angle) * speed;
-                
-                document.getElementById('gameArea').appendChild(particle);
                 
                 let opacity = 1;
                 const fadeInterval = setInterval(() => {
@@ -651,99 +842,20 @@
             }
         }
 
-        // === پاور اپ ایکٹیویٹ ===
-        function activateShield() {
-            if(coins >= 50 && !activePowerups.shield) {
-                coins -= 50;
-                activePowerups.shield = {
-                    active: true,
-                    startTime: Date.now(),
-                    duration: 8000
-                };
-                document.getElementById('shieldIndicator').classList.add('active');
-                updateUI();
-                createParticles(playerX + 30, playerY + 30, 25, '#00ff88');
-            }
-        }
-
-        function activateMagnet() {
-            if(coins >= 30 && !activePowerups.magnet) {
-                coins -= 30;
-                activePowerups.magnet = {
-                    active: true,
-                    startTime: Date.now(),
-                    duration: 6000
-                };
-                document.getElementById('magnetIndicator').classList.add('active');
-                updateUI();
-                createParticles(playerX + 30, playerY + 30, 20, '#ff4444');
-            }
-        }
-
-        // === جوسٹک کنٹرول ===
-        const joystick = document.getElementById('joystick');
-        let isDragging = false;
-
-        joystick.addEventListener('touchstart', startDrag);
-        joystick.addEventListener('mousedown', startDrag);
-
-        function startDrag(e) {
-            isDragging = true;
-            document.addEventListener('touchmove', movePlayer);
-            document.addEventListener('mousemove', movePlayer);
-            document.addEventListener('touchend', stopDrag);
-            document.addEventListener('mouseup', stopDrag);
-        }
-
-        function movePlayer(e) {
-            if(!isDragging || !gameActive) return;
-            
-            const rect = joystick.getBoundingClientRect();
-            const centerX = rect.left + 60;
-            const centerY = rect.top + 60;
-            
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            
-            const deltaX = clientX - centerX;
-            const deltaY = clientY - centerY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            const maxDistance = 40;
-            
-            if(distance > maxDistance) {
-                const angle = Math.atan2(deltaY, deltaX);
-                const limitedX = Math.cos(angle) * maxDistance;
-                const limitedY = Math.sin(angle) * maxDistance;
-                
-                playerX = Math.max(0, Math.min(420, playerX + limitedX * 0.5));
-                playerY = Math.max(0, Math.min(540, playerY + limitedY * 0.5));
-            } else {
-                playerX = Math.max(0, Math.min(420, playerX + deltaX * 0.5));
-                playerY = Math.max(0, Math.min(540, playerY + deltaY * 0.5));
-            }
-            
-            document.getElementById('player').style.left = playerX + 'px';
-            document.getElementById('player').style.top = playerY + 'px';
-        }
-
-        function stopDrag() {
-            isDragging = false;
-            document.removeEventListener('touchmove', movePlayer);
-            document.removeEventListener('mousemove', movePlayer);
-        }
-
         // === UI اپ ڈیٹ ===
         function updateUI() {
             document.getElementById('coins').textContent = coins;
             document.getElementById('score').textContent = score;
-            document.getElementById('level').textContent = currentLevel;
+            document.getElementById('highScore').textContent = highScore;
         }
 
         // === گیم ختم ===
         function endGame() {
             gameActive = false;
+            
             if(score > highScore) {
                 highScore = score;
+                localStorage.setItem('jungleHighScore', highScore);
             }
             
             document.getElementById('finalScore').textContent = score;
@@ -751,7 +863,7 @@
             document.getElementById('finalHighScore').textContent = highScore;
             document.getElementById('gameOverScreen').classList.remove('hidden');
             
-            createParticles(playerX + 30, playerY + 30, 50, '#ff4444');
+            createParticles(player.x + 25, player.y + 40, 30, '#ff4444');
             
             // گیم ختم ہونے پر In-App Interstitial
             loadInAppInterstitial();
@@ -760,26 +872,62 @@
         // === گیم دوبارہ شروع ===
         function restartGame() {
             document.getElementById('gameOverScreen').classList.add('hidden');
-            // تمام آئٹمز صاف کریں
-            document.querySelectorAll('.coin, .obstacle, .powerup').forEach(item => item.remove());
+            document.getElementById('pauseScreen').classList.add('hidden');
             startGame();
         }
 
+        function resumeGame() {
+            gamePaused = false;
+            document.getElementById('pauseScreen').classList.add('hidden');
+            gameLoop();
+        }
+
+        // === کوسٹیوم سلیکشن ===
+        function selectCostume(costume) {
+            selectedCostume = costume;
+            document.querySelectorAll('.costume-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function getCostumeColor() {
+            switch(selectedCostume) {
+                case 'explorer': return '#8B4513';
+                case 'adventurer': return '#4169E1';
+                case 'ninja': return '#2F4F4F';
+                case 'athlete': return '#FF6347';
+                default: return '#8B4513';
+            }
+        }
+
+        function getPowerupColor(type) {
+            switch(type) {
+                case 'shield': return '#00ffff';
+                case 'speed': return '#ffff00';
+                case 'magnet': return '#ff4444';
+                case 'double': return '#00ff00';
+                default: return '#ffffff';
+            }
+        }
+
         // === اشتہارات کے افعال ===
-        function watchAdForStartingCoins() {
+        function watchAdForStartingBonus() {
             if(typeof monetag !== 'undefined') {
                 monetag.showAd('rewarded-popup', {
                     onReward: function() {
-                        coins += 1000;
+                        coins += 500;
+                        activatePowerup('shield');
                         updateUI();
-                        alert('🎉 مبارک ہو! آپ کو 1000 سکے مل گئے!');
+                        alert('🎉 مبارک ہو! آپ کو 500 سکے اور شیلڈ ملا!');
                     }
                 });
             } else {
                 // ڈیمو کے لیے
-                coins += 1000;
+                coins += 500;
+                activatePowerup('shield');
                 updateUI();
-                alert('[DEMO] 🎉 مبارک ہو! آپ کو 1000 سکے مل گئے!');
+                alert('[DEMO] 🎉 مبارک ہو! آپ کو 500 سکے اور شیلڈ ملا!');
             }
         }
 
@@ -789,36 +937,44 @@
                     onReward: function() {
                         document.getElementById('gameOverScreen').classList.add('hidden');
                         gameActive = true;
-                        createParticles(playerX + 30, playerY + 30, 30, '#00ffff');
+                        player.y = 600;
+                        player.velocityY = 0;
+                        player.isJumping = false;
+                        activatePowerup('shield');
                         gameLoop();
-                        alert('🚀 مہم جاری ہے! آپ کو دوسرا موقع ملا!');
+                        alert('🚀 کھیل جاری ہے! آپ کو دوسرا موقع ملا!');
                     }
                 });
             } else {
                 // ڈیمو کے لیے
                 document.getElementById('gameOverScreen').classList.add('hidden');
                 gameActive = true;
-                createParticles(playerX + 30, playerY + 30, 30, '#00ffff');
+                player.y = 600;
+                player.velocityY = 0;
+                player.isJumping = false;
+                activatePowerup('shield');
                 gameLoop();
-                alert('[DEMO] 🚀 مہم جاری ہے! آپ کو دوسرا موقع ملا!');
+                alert('[DEMO] 🚀 کھیل جاری ہے! آپ کو دوسرا موقع ملا!');
             }
         }
 
-        function watchAdForDoubleCoins() {
+        function watchAdForDoubleRewards() {
             if(typeof monetag !== 'undefined') {
                 monetag.showAd('rewarded-interstitial', {
                     onReward: function() {
                         coins *= 2;
+                        score *= 2;
                         updateUI();
-                        alert('🎯 مبارک ہو! آپ کے سکے دگنے ہو گئے!');
+                        alert('🎯 مبارک ہو! آپ کے انعامات دگنے ہو گئے!');
                         restartGame();
                     }
                 });
             } else {
                 // ڈیمو کے لیے
                 coins *= 2;
+                score *= 2;
                 updateUI();
-                alert('[DEMO] 🎯 مبارک ہو! آپ کے سکے دگنے ہو گئے!');
+                alert('[DEMO] 🎯 مبارک ہو! آپ کے انعامات دگنے ہو گئے!');
                 restartGame();
             }
         }
@@ -831,24 +987,32 @@
             }
         }
 
-        // === ہیلپر فنکشنز ===
-        function getPowerupColor(type) {
-            const colors = {
-                shield: '#00ff88',
-                magnet: '#ff4444',
-                slowmo: '#8844ff'
-            };
-            return colors[type] || '#ffffff';
-        }
+        // === کی بورڈ کنٹرولز ===
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowUp' || e.key === ' ') jump();
+            if(e.key === 'ArrowDown') slide();
+            if(e.key === 'p') togglePause();
+            if(e.key === 'r') restartGame();
+        });
 
-        // پلے جوسٹک پوزیشن
-        document.getElementById('player').style.left = playerX + 'px';
-        document.getElementById('player').style.top = playerY + 'px';
+        function togglePause() {
+            if(gameActive) {
+                gamePaused = !gamePaused;
+                document.getElementById('pauseScreen').classList.toggle('hidden');
+                if(!gamePaused) {
+                    gameLoop();
+                }
+            }
+        }
 
         // ہائی اسکور لوڈ کریں
-        if(localStorage.getItem('spaceHighScore')) {
-            highScore = parseInt(localStorage.getItem('spaceHighScore'));
+        if(localStorage.getItem('jungleHighScore')) {
+            highScore = parseInt(localStorage.getItem('jungleHighScore'));
+            document.getElementById('highScore').textContent = highScore;
         }
+
+        // پہلے سے کوسٹیوم سلیکٹ کریں
+        document.querySelector('.costume-option').click();
     </script>
 
     <!-- Monetag SDK (اپنا Placement ID لگائیں) -->
